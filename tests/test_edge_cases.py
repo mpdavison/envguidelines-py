@@ -55,9 +55,7 @@ class TestTimeoutHandling:
         httpx_mock.add_exception(httpx.TimeoutException("Connection timed out"))
 
         with pytest.raises(GuidelinelyTimeoutError):
-            calculate_guidelines(
-                parameter="Aluminum", media="surface_water", api_key="test_key"
-            )
+            calculate_guidelines(parameter="Aluminum", media="surface_water", api_key="test_key")
 
 
 class TestInvalidJsonResponses:
@@ -108,9 +106,7 @@ class TestHttp4xxErrorCodes:
         )
 
         with pytest.raises(GuidelinelyAPIError) as exc_info:
-            calculate_guidelines(
-                parameter="Invalid!!!", media="surface_water", api_key="test_key"
-            )
+            calculate_guidelines(parameter="Invalid!!!", media="surface_water", api_key="test_key")
 
         assert exc_info.value.status_code == 400
         assert "Invalid parameter format" in str(exc_info.value)
@@ -146,9 +142,7 @@ class TestHttp4xxErrorCodes:
         )
 
         with pytest.raises(GuidelinelyAPIError) as exc_info:
-            calculate_guidelines(
-                parameter="Aluminum", media="surface_water", api_key="test_key"
-            )
+            calculate_guidelines(parameter="Aluminum", media="surface_water", api_key="test_key")
 
         assert exc_info.value.status_code == 403
         assert "Rate limit exceeded" in str(exc_info.value)
@@ -164,9 +158,7 @@ class TestHttp4xxErrorCodes:
         )
 
         with pytest.raises(GuidelinelyAPIError) as exc_info:
-            calculate_guidelines(
-                parameter="NonExistent", media="surface_water", api_key="test_key"
-            )
+            calculate_guidelines(parameter="NonExistent", media="surface_water", api_key="test_key")
 
         assert exc_info.value.status_code == 404
         assert "not found" in str(exc_info.value).lower()

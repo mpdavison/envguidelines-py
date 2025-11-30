@@ -155,7 +155,12 @@ def test_source_response_valid():
         "name": "Canadian Council of Ministers of the Environment",
         "abbreviation": "CCME",
         "documents": [
-            {"id": 1, "title": "Canadian Water Quality Guidelines", "year": 2021, "url": "https://example.com"},
+            {
+                "id": 1,
+                "title": "Canadian Water Quality Guidelines",
+                "year": 2021,
+                "url": "https://example.com",
+            },
             {"id": 2, "title": "Canadian Soil Quality Guidelines", "year": 2020},
         ],
     }
