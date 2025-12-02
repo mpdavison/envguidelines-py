@@ -5,6 +5,7 @@ for chemical parameters in various media (water, soil, sediment).
 """
 
 import logging
+import os
 from typing import Any, Optional, Union, cast
 
 import httpx
@@ -24,8 +25,8 @@ logger = logging.getLogger("guidelinely")
 # API base URL
 GUIDELINELY_API_BASE = "https://guidelines.1681248.com/api/v1"
 
-# Default timeout for HTTP requests (in seconds)
-DEFAULT_TIMEOUT = 30.0
+# Default timeout for HTTP requests (in seconds), configurable via environment variable
+DEFAULT_TIMEOUT = float(os.getenv("GUIDELINELY_TIMEOUT", "30.0"))
 
 # Package version for User-Agent header (duplicated from __init__.py to avoid circular import)
 __version__ = "0.1.0"

@@ -11,27 +11,27 @@ This Python client mirrors the functionality of the [R client](https://github.co
 
 ## Features
 
-
 - ✅ **Metadata Queries**: List parameters, search, explore media types and sources
 - ✅ **Single Calculations**: Calculate guidelines for individual parameters
 - ✅ **Batch Calculations**: Efficiently calculate multiple parameters (up to 50)
 - ✅ **Context-Aware**: Support for pH, hardness, temperature, and other environmental factors
 - ✅ **Unit Conversion**: Optional target unit specification
 - ✅ **Type Safety**: Full Pydantic model support for request/response validation
-- ✅ **Comprehensive Tests**: Mock-based test suite with responses library
+- ✅ **Comprehensive Tests**: Mock-based test suite with pytest-httpx
 
 ## Installation
 
+Requires **Python 3.9+**.
+
 ```bash
-# Clone the repository
+# Install from PyPI (when available)
+pip install guidelinely
+
+# Or install from source
 git clone https://github.com/mpdavison/envguidelines-py.git
 cd envguidelines-py
-
-# Install in development mode
-pip install -e .
-
-# Or install with dev dependencies
-pip install -e ".[dev]"
+pip install -e .            # Development mode
+pip install -e ".[dev]"     # With dev dependencies
 ```
 
 ## Quick Start
@@ -63,6 +63,33 @@ export GUIDELINELY_API_KEY="your_api_key_here"
 ```
 
 Metadata endpoints (list parameters, search, etc.) work without authentication.
+
+## Environment Variables
+
+The library supports the following environment variables for configuration:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `GUIDELINELY_API_KEY` | API key for calculation endpoints | None (optional) |
+| `GUIDELINELY_CACHE_DIR` | Directory for persistent caching | `~/.guidelinely_cache` |
+| `GUIDELINELY_CACHE_TTL` | Cache time-to-live in seconds | `604800` (7 days) |
+| `GUIDELINELY_TIMEOUT` | HTTP request timeout in seconds | `30` |
+
+### Cache Configuration
+
+By default, calculation results are cached to `~/.guidelinely_cache` for 7 days. You can customize the location and TTL:
+
+```bash
+export GUIDELINELY_CACHE_DIR="/path/to/custom/cache"
+export GUIDELINELY_CACHE_TTL="86400"  # 1 day in seconds
+```
+
+To manually clear the cache:
+
+```python
+from guidelinely.cache import cache
+cache.clear()
+```
 
 ## Usage Examples
 
@@ -203,6 +230,43 @@ context = {
 }
 ```
 
+## Error Handling
+
+The library provides custom exceptions for structured error handling:
+
+```python
+from guidelinely import (
+    calculate_guidelines,
+    GuidelinelyError,
+    GuidelinelyAPIError,
+    GuidelinelyTimeoutError,
+)
+
+try:
+    result = calculate_guidelines(
+        parameter="Copper",
+        media="surface_water",
+        context={"pH": "7.0 1", "hardness": "100 mg/L"}
+    )
+except GuidelinelyTimeoutError:
+    print("Request timed out, please try again")
+except GuidelinelyAPIError as e:
+    if e.status_code == 404:
+        print("Parameter not found")
+    elif e.status_code == 401:
+        print("Invalid API key")
+    else:
+        print(f"API error {e.status_code}: {e.message}")
+except GuidelinelyError as e:
+    print(f"Guidelinely error: {e}")
+```
+
+### Exception Types
+
+- `GuidelinelyError` - Base exception for all library errors
+- `GuidelinelyAPIError` - API returned an error response (has `status_code` and `message` attributes)
+- `GuidelinelyTimeoutError` - Request timed out
+
 ## Data Models
 
 The library uses Pydantic for type-safe data handling:
@@ -298,4 +362,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style guidelines, and the pull request process.

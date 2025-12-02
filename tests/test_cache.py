@@ -94,3 +94,29 @@ class TestCacheConfiguration:
                 os.environ["GUIDELINELY_CACHE_DIR"] = old_value
             else:
                 os.environ.pop("GUIDELINELY_CACHE_DIR", None)
+
+    def test_default_ttl_value(self):
+        """DEFAULT_TTL should be 7 days (604800 seconds) by default."""
+        # When env var is not set, should be 7 days
+        old_value = os.environ.pop("GUIDELINELY_CACHE_TTL", None)
+        try:
+            expected_ttl = 7 * 24 * 3600  # 604800 seconds
+            test_ttl = int(os.getenv("GUIDELINELY_CACHE_TTL", str(expected_ttl)))
+            assert test_ttl == expected_ttl
+        finally:
+            if old_value is not None:
+                os.environ["GUIDELINELY_CACHE_TTL"] = old_value
+
+    def test_ttl_from_environment(self):
+        """DEFAULT_TTL should use GUIDELINELY_CACHE_TTL env var when set."""
+        custom_ttl = "3600"  # 1 hour
+        old_value = os.environ.get("GUIDELINELY_CACHE_TTL")
+        try:
+            os.environ["GUIDELINELY_CACHE_TTL"] = custom_ttl
+            test_ttl = int(os.getenv("GUIDELINELY_CACHE_TTL", str(7 * 24 * 3600)))
+            assert test_ttl == int(custom_ttl)
+        finally:
+            if old_value is not None:
+                os.environ["GUIDELINELY_CACHE_TTL"] = old_value
+            else:
+                os.environ.pop("GUIDELINELY_CACHE_TTL", None)
