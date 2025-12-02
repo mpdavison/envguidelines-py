@@ -11,6 +11,7 @@ This Python client mirrors the functionality of the [R client](https://github.co
 
 ## Features
 
+
 - ✅ **Metadata Queries**: List parameters, search, explore media types and sources
 - ✅ **Single Calculations**: Calculate guidelines for individual parameters
 - ✅ **Batch Calculations**: Efficiently calculate multiple parameters (up to 50)
