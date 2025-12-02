@@ -128,13 +128,24 @@ def main():
             media="surface_water",
             context={
                 "pH": "7.5 1",
-                "hardness": "150 mg/L",
-                "temperature": temp,
-                "chloride": "18 mg/L",
+                "temperature": temp
             },
         )
         ammonia_results[temp] = temp_result
-        print(f"  {temp}: {temp_result.total_count} guidelines")
+        
+        """All results will have the same unit"""
+        all_units = {g.unit for g in temp_result.results}
+        if len(all_units) != 1:
+            raise ValueError("Inconsistent units in ammonia results")
+        
+        unit = all_units.pop()
+        min_upper = min(
+            (g.upper for g in temp_result.results if g.upper is not None), default=None
+        )
+        max_upper = max(
+            (g.upper for g in temp_result.results if g.upper is not None), default=None
+        )
+        print(f"  {temp}: {temp_result.total_count} guidelines (Min upper limit: {min_upper:.2f} {unit}, Max upper limit: {max_upper:.2f} {unit})")
 
 
 if __name__ == "__main__":
