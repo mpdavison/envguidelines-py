@@ -44,10 +44,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mpdavison/guidelinely-python"
+Homepage = "https://github.com/mpdavison/envguidelines-py"
 Documentation = "https://guidelines.1681248.com/docs"
-Repository = "https://github.com/mpdavison/guidelinely-python"
-"Bug Tracker" = "https://github.com/mpdavison/guidelinely-python/issues"
+Repository = "https://github.com/mpdavison/envguidelines-py"
+"Bug Tracker" = "https://github.com/mpdavison/envguidelines-py/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

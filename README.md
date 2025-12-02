@@ -24,8 +24,8 @@ This Python client mirrors the functionality of the [R client](https://github.co
 
 ```bash
 # Clone the repository
-git clone https://github.com/mpdavison/guidelinely-python.git
-cd guidelinely-python
+git clone https://github.com/mpdavison/envguidelines-py.git
+cd envguidelines-py
 
 # Install in development mode
 pip install -e .
@@ -290,7 +290,7 @@ See the `examples/` directory for complete working examples:
 - **API Documentation**: https://guidelines.1681248.com/docs
 - **OpenAPI Spec**: https://guidelines.1681248.com/openapi.json
 - **R Client**: https://github.com/mpdavison/envguidelines
-- **Issue Tracker**: https://github.com/mpdavison/guidelinely-python/issues
+- **Issue Tracker**: https://github.com/mpdavison/envguidelines-py/issues
 
 ## License
 
