@@ -276,7 +276,7 @@ for guideline in result.results:
 
 ## Guideline Value Format
 
-Guidelines use PostgreSQL `unitrange` format:
+Guidelines use [postgresql-unit](https://github.com/df7cb/postgresql-unit) `unitrange` format:
 - `[10 μg/L,100 μg/L]` - Range from 10 to 100 μg/L
 - `(,87.0 μg/L]` - Upper limit only (≤87.0 μg/L)
 - `[5.0 mg/L,)` - Lower limit only (≥5.0 mg/L)
