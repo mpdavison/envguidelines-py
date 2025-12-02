@@ -29,9 +29,12 @@ def test_guideline_response_valid():
         "source": "CCME",
         "receptor": "Aquatic Life",
         "exposure_duration": "chronic",
-        "guideline_type": "protective",
-        "document_abbreviation": "CCME-1999",
-        "source_abbreviation": "CCME",
+        "purpose": "long_term",
+        "table": "Table 1",
+        "application": "Freshwater guidelines",
+        "basis": "Chronic toxicity",
+        "use_case": "Protection",
+        "document": "CCME Water Quality Guidelines",
     }
 
     guideline = GuidelineResponse(**data)
@@ -53,15 +56,19 @@ def test_guideline_response_optional_fields():
         "source": "CCME",
         "receptor": "Aquatic Life",
         "exposure_duration": "chronic",
-        "guideline_type": "protective",
-        "document_abbreviation": "CCME-1999",
-        "source_abbreviation": "CCME",
+        "purpose": "long_term",
+        "table": "Table 1",
+        "application": "Freshwater guidelines",
+        "basis": "Chronic toxicity",
+        "use_case": "Protection",
+        "document": "CCME Water Quality Guidelines",
     }
 
     guideline = GuidelineResponse(**data)
-    assert guideline.notes is None
+    assert guideline.narrative is None
     assert guideline.lower is None
     assert guideline.upper is None
+    assert guideline.context_index is None
 
 
 def test_calculation_response_valid():
@@ -79,9 +86,12 @@ def test_calculation_response_valid():
                 "source": "CCME",
                 "receptor": "Aquatic Life",
                 "exposure_duration": "chronic",
-                "guideline_type": "protective",
-                "document_abbreviation": "CCME-1999",
-                "source_abbreviation": "CCME",
+                "purpose": "long_term",
+                "table": "Table 1",
+                "application": "Freshwater guidelines",
+                "basis": "Chronic toxicity",
+                "use_case": "Protection",
+                "document": "CCME Water Quality Guidelines",
             }
         ],
         "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
@@ -92,6 +102,7 @@ def test_calculation_response_valid():
     assert response.total_count == 1
     assert len(response.results) == 1
     assert response.results[0].parameter_specification == "Aluminum, Dissolved"
+    assert response.contexts is None  # Optional field
 
 
 def test_calculate_request_valid():

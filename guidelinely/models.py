@@ -28,25 +28,33 @@ class GuidelineResponse(BaseModel):
 
     id: int
     parameter: str
+    method_speciation: Optional[str] = None
+    sample_fraction: Optional[str] = None
     parameter_specification: str
+    receptor: str
+    exposure_duration: str
     media: str
+    purpose: str
+    table: str
+    application: str
+    basis: str
     value: str  # PostgreSQL unitrange format: '[10 μg/L,100 μg/L]', '(,87.0 μg/L]', '[5.0 mg/L,)'
     lower: Optional[float] = None  # Parsed lower bound or None if unbounded
     upper: Optional[float] = None  # Parsed upper bound or None if unbounded
     unit: str
     is_calculated: bool
+    calculation_used: Optional[str] = None
+    formula_svg: Optional[str] = None
+    narrative: Optional[str] = None  # Qualitative guidance text for narrative guidelines
+    use_case: str
     source: str
-    basis: Optional[str] = None
-    receptor: str
-    exposure_duration: str
-    guideline_type: Optional[str] = None
-    notes: Optional[str] = None
-    reference_id: Optional[int] = None
-    document_id: Optional[int] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
-    document_abbreviation: str
-    source_abbreviation: str
+    source_abbreviation: Optional[str] = None
+    document: str
+    document_url: Optional[str] = None
+    document_abbreviation: Optional[str] = None
+    error: Optional[str] = None  # Error message if resolution failed
+    error_type: Optional[str] = None  # Error type: validation, lookup, or unexpected
+    context_index: Optional[int] = None  # Index of context used when multiple contexts provided
 
 
 class CalculationResponse(BaseModel):
@@ -54,6 +62,7 @@ class CalculationResponse(BaseModel):
 
     results: list[GuidelineResponse]
     context: dict[str, Any]  # Environmental context used for calculation
+    contexts: Optional[list[dict[str, Any]]] = None  # List of contexts when multiple provided
     total_count: int
 
 
@@ -62,7 +71,8 @@ class CalculateRequest(BaseModel):
 
     parameter: str
     media: str
-    context: Optional[dict[str, str]] = None  # Environmental parameters as strings with units
+    # Single context dict or list of dicts for multiple contexts
+    context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None
     target_unit: Optional[str] = None  # Optional unit conversion
 
 
@@ -78,7 +88,8 @@ class BatchCalculateRequest(BaseModel):
 
     parameters: list[Union[str, ParameterWithUnit]]  # Mix of strings and objects
     media: str
-    context: Optional[dict[str, str]] = None
+    # Single context dict or list of dicts for multiple contexts
+    context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None
 
     @model_validator(mode="after")
     def validate_parameter_count(self) -> "BatchCalculateRequest":
@@ -99,9 +110,11 @@ class BatchCalculateRequest(BaseModel):
 
 
 class SearchParametersRequest(BaseModel):
-    """Request body for parameter search (optional media filter)."""
+    """Request body for parameter search with optional filters."""
 
     media: Optional[list[str]] = None
+    source: Optional[list[str]] = None  # Filter by source abbreviation (e.g., AEPA, CCME)
+    document: Optional[list[str]] = None  # Filter by document abbreviation (e.g., PAL, MDMER)
 
 
 class MediaResponse(BaseModel):

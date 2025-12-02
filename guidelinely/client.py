@@ -141,7 +141,12 @@ def list_parameters() -> list[str]:
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
 
 
-def search_parameters(q: str = "", media: Optional[list[str]] = None) -> list[str]:
+def search_parameters(
+    q: str = "",
+    media: Optional[list[str]] = None,
+    source: Optional[list[str]] = None,
+    document: Optional[list[str]] = None,
+) -> list[str]:
     """Search for chemical parameters.
 
     Search for chemical parameters using case-insensitive substring matching.
@@ -149,6 +154,8 @@ def search_parameters(q: str = "", media: Optional[list[str]] = None) -> list[st
     Args:
         q: Search query string. Empty string returns all parameters.
         media: Optional list of media types to filter by (e.g., ["surface_water", "soil"]).
+        source: Optional list of source abbreviations to filter by (e.g., ["AEPA", "CCME"]).
+        document: Optional list of document abbreviations to filter by (e.g., ["PAL", "MDMER"]).
 
     Returns:
         List of matching parameter names.
@@ -164,13 +171,25 @@ def search_parameters(q: str = "", media: Optional[list[str]] = None) -> list[st
 
         # Find copper in surface water
         copper_sw = search_parameters("copper", media=["surface_water"])
+
+        # Find aluminum in groundwater from AEPA PAL document
+        aluminum = search_parameters(
+            "aluminum", media=["groundwater"], source=["AEPA"], document=["PAL"]
+        )
     """
-    logger.debug(f"Searching parameters with q={q!r}, media={media!r}")
+    logger.debug(
+        f"Searching parameters with q={q!r}, media={media!r}, "
+        f"source={source!r}, document={document!r}"
+    )
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
             params: dict[str, Any] = {"q": q}
             if media:
                 params["media"] = media
+            if source:
+                params["source"] = source
+            if document:
+                params["document"] = document
 
             response = client.get(
                 f"{GUIDELINELY_API_BASE}/parameters/search",
@@ -277,7 +296,7 @@ def get_stats() -> StatsResponse:
 def calculate_guidelines(
     parameter: str,
     media: str,
-    context: Optional[dict[str, str]] = None,
+    context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None,
     target_unit: Optional[str] = None,
     api_key: Optional[str] = None,
 ) -> CalculationResponse:
@@ -289,7 +308,8 @@ def calculate_guidelines(
     Args:
         parameter: Chemical parameter name (e.g., "Aluminum", "Copper").
         media: Media type (e.g., "surface_water", "soil", "sediment").
-        context: Dictionary of environmental parameters as strings with units.
+        context: Environmental parameters as strings with units. Can be a single dict
+            or a list of dicts for multiple calculations with different contexts.
             For water: pH ("7.0 1"), hardness ("100 mg/L"), temperature ("20 °C"),
                       chloride ("50 mg/L")
             For soil: pH ("6.5 1"), organic_matter ("3.5 %"),
@@ -298,7 +318,9 @@ def calculate_guidelines(
         api_key: Optional API key. If None, will use GUIDELINELY_API_KEY environment variable.
 
     Returns:
-        CalculationResponse with results, context, and total_count.
+        CalculationResponse with results, context, contexts (if multiple), and total_count.
+        When multiple contexts are provided, results include context_index indicating
+        which context was used.
 
     Raises:
         GuidelinelyAPIError: If the API returns an error response.
@@ -308,10 +330,21 @@ def calculate_guidelines(
         >>> import os
         >>> os.environ["GUIDELINELY_API_KEY"] = "your_key"
         >>>
+        >>> # Single context
         >>> result = calculate_guidelines(
         ...     parameter="Aluminum",
         ...     media="surface_water",
         ...     context={"pH": "7.0 1", "hardness": "100 mg/L"}
+        ... )
+        >>>
+        >>> # Multiple contexts - compare across conditions
+        >>> result = calculate_guidelines(
+        ...     parameter="Aluminum",
+        ...     media="surface_water",
+        ...     context=[
+        ...         {"pH": "7.0 1", "hardness": "100 mg/L"},
+        ...         {"pH": "8.0 1", "hardness": "200 mg/L"}
+        ...     ]
         ... )
         >>>
         >>> print(f"Total: {result.total_count}")
@@ -373,7 +406,7 @@ def calculate_guidelines(
 def calculate_batch(
     parameters: list[Union[str, dict[str, Any]]],
     media: str,
-    context: Optional[dict[str, str]] = None,
+    context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None,
     api_key: Optional[str] = None,
 ) -> CalculationResponse:
     """Batch calculate guidelines for multiple parameters.
@@ -385,11 +418,14 @@ def calculate_batch(
         parameters: List of parameter names (strings), or list mixing strings and dicts
             with 'name' and 'target_unit' fields. Maximum 50 parameters.
         media: Media type (e.g., "surface_water", "soil").
-        context: Dictionary of environmental parameters as strings with units.
+        context: Environmental parameters as strings with units. Can be a single dict
+            or a list of dicts for multiple calculations with different contexts.
         api_key: Optional API key. If None, will use GUIDELINELY_API_KEY environment variable.
 
     Returns:
-        CalculationResponse with results, context, and total_count.
+        CalculationResponse with results, context, contexts (if multiple), and total_count.
+        When multiple contexts are provided, results include context_index indicating
+        which context was used.
 
     Raises:
         ValueError: If more than 50 parameters provided.
@@ -405,6 +441,16 @@ def calculate_batch(
         ...     parameters=["Aluminum", "Copper", "Lead"],
         ...     media="surface_water",
         ...     context={"pH": "7.0 1", "hardness": "100 mg/L"}
+        ... )
+        >>>
+        >>> # Multiple contexts - compare across conditions
+        >>> results = calculate_batch(
+        ...     parameters=["Aluminum", "Copper"],
+        ...     media="surface_water",
+        ...     context=[
+        ...         {"pH": "7.0 1", "hardness": "100 mg/L"},
+        ...         {"pH": "8.0 1", "hardness": "200 mg/L"}
+        ...     ]
         ... )
         >>>
         >>> # With per-parameter unit conversion
