@@ -39,12 +39,11 @@ pip install -e ".[dev]"     # With dev dependencies
 ```python
 from guidelinely import calculate_guidelines
 
-# Calculate aluminum guidelines in surface water
+# Calculate dissolved aluminum guidelines in surface water
 result = calculate_guidelines(
-    parameter="Aluminum",
+    parameter="Aluminum, Dissolved",
     media="surface_water",
     context={
-        "pH": "7.0 1",           # pH 7.0 (dimensionless)
         "hardness": "100 mg/L"   # Water hardness as CaCO3
     }
 )
@@ -136,21 +135,19 @@ import os
 os.environ["GUIDELINELY_API_KEY"] = "your_key"
 
 result = calculate_guidelines(
-    parameter="Copper",
+    parameter="Ammonia, un-ionized as N",
     media="surface_water",
     context={
         "pH": "7.5 1",
-        "hardness": "150 mg/L",
-        "temperature": "15 °C",
-        "chloride": "75 mg/L"
+        "temperature": "15 °C"
     },
-    target_unit="μg/L"  # Optional unit conversion
+    target_unit="mg/L"  # Optional unit conversion
 )
 
 # Filter results
 chronic_aquatic = [
     g for g in result.results
-    if g.receptor == "Aquatic Life" and g.exposure_duration == "chronic"
+    if g.basis == "aquatic biota" and g.exposure_duration == "Chronic"
 ]
 ```
 
@@ -161,12 +158,13 @@ from guidelinely import calculate_batch
 
 # Calculate multiple parameters at once (more efficient)
 result = calculate_batch(
-    parameters=["Aluminum", "Copper", "Lead", "Zinc", "Cadmium"],
+    parameters=["Aluminum, Dissolved", "Ammonia, un-ionized as N", "Lead, Dissolved", "Sulfate as SO4", "Nitrite as N"],
     media="surface_water",
     context={
         "pH": "7.5 1",
         "hardness": "150 mg/L",
-        "temperature": "15 °C"
+        "temperature": "15 °C",
+        "chloride": "18 mg/L"
     }
 )
 
@@ -175,30 +173,19 @@ print(f"Total: {result.total_count} guidelines")
 # With per-parameter unit conversion
 result = calculate_batch(
     parameters=[
-        "Aluminum",
-        {"name": "Copper", "target_unit": "μg/L"},
-        {"name": "Lead", "target_unit": "mg/L"}
+        "Aluminum, Dissolved",
+        {"name": "Lead, Dissolved", "target_unit": "mg/L"}
     ],
     media="surface_water",
-    context={"pH": "7.0 1", "hardness": "100 mg/L"}
-)
-```
-
-### Soil Calculations
-
-```python
-result = calculate_guidelines(
-    parameter="Lead",
-    media="soil",
     context={
-        "pH": "6.5 1",
-        "organic_matter": "3.5 %",
-        "cation_exchange_capacity": "15 meq/100g"
+        "hardness": "100 mg/L",
     }
 )
 ```
 
 ## Environmental Context Parameters
+
+> **Note**: Currently, only **surface_water** and **groundwater** guidelines are present in the API database. Soil, sediment, and other media types are planned for future releases.
 
 All context parameters **must be strings with units** (Pint format):
 
@@ -212,7 +199,7 @@ context = {
 }
 ```
 
-### Soil
+### Soil (coming soon)
 ```python
 context = {
     "pH": "6.5 1",
@@ -221,7 +208,7 @@ context = {
 }
 ```
 
-### Sediment
+### Sediment (coming soon)
 ```python
 context = {
     "pH": "7.0 1",
@@ -346,7 +333,7 @@ See the `examples/` directory for complete working examples:
 1. `01_basic_metadata.py` - Basic metadata queries
 2. `02_calculate_single_parameter.py` - Single parameter calculations
 3. `03_batch_calculations.py` - Batch calculations
-4. `04_soil_calculations.py` - Soil-specific calculations
+4. `04_soil_calculations.py` - Groundwater calculations (soil guidelines coming soon)
 5. `05_advanced_workflow.py` - Advanced filtering and analysis
 
 ## Resources

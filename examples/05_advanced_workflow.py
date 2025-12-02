@@ -15,37 +15,38 @@ def main():
     # Ensure API key is set
     api_key = os.getenv("GUIDELINELY_API_KEY")
     if not api_key:
-        print("Error: GUIDELINELY_API_KEY environment variable not set")
-        print("Set it with: export GUIDELINELY_API_KEY='your_api_key_here'")
-        return
+        print("Note: GUIDELINELY_API_KEY environment variable not set")
+        print("API key is optional but recommended for calculation endpoints")
+        print()
 
     print("=== Advanced Workflow: Comprehensive Water Quality Analysis ===")
     print()
 
     # Comprehensive batch calculation
+    # Note: Parameter names must match exactly - use search_parameters() to find valid names
     result = calculate_batch(
         parameters=[
-            "Aluminum",
-            "Ammonia",
-            "Arsenic",
-            "Cadmium",
+            "Aluminum, Dissolved",
+            "Ammonia, un-ionized as N",
+            "Arsenic, Dissolved",
+            "Cadmium, Dissolved",
             "Chloride",
-            "Chromium",
-            "Copper",
-            "Iron",
-            "Lead",
-            "Mercury",
-            "Nickel",
-            "Selenium",
-            "Silver",
-            "Zinc",
+            "Chromium, Dissolved",
+            "Copper, Dissolved",
+            "Iron, Dissolved",
+            "Lead, Dissolved",
+            "Mercury, Dissolved",
+            "Nickel, Dissolved",
+            "Selenium, Dissolved",
+            "Silver, Dissolved",
+            "Zinc, Dissolved",
         ],
         media="surface_water",
         context={
             "pH": "7.5 1",
             "hardness": "150 mg/L",
             "temperature": "15 °C",
-            "chloride": "75 mg/L",
+            "chloride": "18 mg/L",
         },
     )
 
@@ -123,13 +124,13 @@ def main():
 
     for temp in temps:
         temp_result = calculate_batch(
-            parameters=["Ammonia"],
+            parameters=["Ammonia, un-ionized as N"],
             media="surface_water",
             context={
                 "pH": "7.5 1",
                 "hardness": "150 mg/L",
                 "temperature": temp,
-                "chloride": "75 mg/L",
+                "chloride": "18 mg/L",
             },
         )
         ammonia_results[temp] = temp_result

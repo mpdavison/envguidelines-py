@@ -1,6 +1,6 @@
 """Calculate Guidelines for a Single Parameter.
 
-Calculate aluminum guidelines in surface water with specific conditions.
+Calculate dissolved aluminum guidelines in surface water with specific conditions.
 """
 
 import os
@@ -9,24 +9,24 @@ from guidelinely import calculate_guidelines
 
 
 def main():
-    """Calculate aluminum guidelines in surface water."""
+    """Calculate dissolved aluminum guidelines in surface water."""
 
     # Ensure API key is set
     api_key = os.getenv("GUIDELINELY_API_KEY")
     if not api_key:
-        print("Error: GUIDELINELY_API_KEY environment variable not set")
-        print("Set it with: export GUIDELINELY_API_KEY='your_api_key_here'")
-        return
+        print("Note: GUIDELINELY_API_KEY environment variable not set")
+        print("API key is optional but recommended for calculation endpoints")
+        print()
 
-    print("=== Calculate Aluminum in Surface Water ===")
+    print("=== Calculate Dissolved Aluminum in Surface Water ===")
     print()
 
     # Calculate aluminum guidelines in surface water
+    # Note: Parameter names must match exactly - use search_parameters() to find valid names
     result = calculate_guidelines(
-        parameter="Aluminum",
+        parameter="Aluminum, Dissolved",
         media="surface_water",
         context={
-            "pH": "7.0 1",  # pH 7.0 (dimensionless, use "1" as unit)
             "hardness": "100 mg/L",  # 100 mg/L as CaCO3
         },
     )
@@ -57,9 +57,9 @@ def main():
     print()
 
     result_mg = calculate_guidelines(
-        parameter="Aluminum",
+        parameter="Aluminum, Dissolved",
         media="surface_water",
-        context={"pH": "7.0 1", "hardness": "100 mg/L"},
+        context={"hardness": "100 mg/L"},
         target_unit="mg/L",  # Convert to mg/L
     )
 

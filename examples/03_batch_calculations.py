@@ -1,6 +1,6 @@
 """Batch Calculations for Multiple Parameters.
 
-Calculate guidelines for multiple metals in surface water.
+Calculate guidelines for multiple parameters in surface water.
 """
 
 import os
@@ -9,27 +9,34 @@ from guidelinely import calculate_batch
 
 
 def main():
-    """Batch calculate multiple metal parameters."""
+    """Batch calculate multiple parameters."""
 
     # Ensure API key is set
     api_key = os.getenv("GUIDELINELY_API_KEY")
     if not api_key:
-        print("Error: GUIDELINELY_API_KEY environment variable not set")
-        print("Set it with: export GUIDELINELY_API_KEY='your_api_key_here'")
-        return
+        print("Note: GUIDELINELY_API_KEY environment variable not set")
+        print("API key is optional but recommended for calculation endpoints")
+        print()
 
-    print("=== Batch Calculate Multiple Metals ===")
+    print("=== Batch Calculate Multiple Parameters ===")
     print()
 
-    # Calculate multiple metals in surface water
+    # Calculate multiple parameters in surface water
+    # Note: Parameter names must match exactly - use search_parameters() to find valid names
     result = calculate_batch(
-        parameters=["Aluminum", "Copper", "Lead", "Zinc", "Cadmium"],
+        parameters=[
+            "Aluminum, Dissolved",
+            "Ammonia, un-ionized as N",
+            "Lead, Dissolved",
+            "Sulfate as SO4",
+            "Nitrite as N",
+        ],
         media="surface_water",
         context={
             "pH": "7.5 1",  # Slightly alkaline
             "hardness": "150 mg/L",  # Moderately hard water
             "temperature": "15 °C",  # Cool water
-            "chloride": "75 mg/L",  # Moderate chloride
+            "chloride": "18 mg/L",  # Moderate chloride
         },
     )
 
@@ -58,25 +65,20 @@ def main():
 
     result2 = calculate_batch(
         parameters=[
-            "Aluminum",
-            {"name": "Copper", "target_unit": "μg/L"},
-            {"name": "Lead", "target_unit": "mg/L"},
+            "Aluminum, Dissolved",
+            {"name": "Lead, Dissolved", "target_unit": "mg/L"},
         ],
         media="surface_water",
-        context={"pH": "7.0 1", "hardness": "100 mg/L"},
+        context={"hardness": "100 mg/L"},
     )
 
     print(f"Total guidelines found: {result2.total_count}")
 
-    # Filter to chronic aquatic life guidelines
-    print("\n=== Chronic Aquatic Life Guidelines ===")
-    chronic_aquatic = [
-        g
-        for g in result.results
-        if g.receptor == "Aquatic Life" and g.exposure_duration == "chronic"
-    ]
+    # Filter to chronic exposure guidelines
+    print("\n=== Chronic Exposure Guidelines ===")
+    chronic = [g for g in result.results if g.exposure_duration == "Chronic"]
 
-    for guideline in chronic_aquatic[:10]:  # Show first 10
+    for guideline in chronic[:10]:  # Show first 10
         upper = guideline.upper if guideline.upper else "unbounded"
         print(f"{guideline.parameter}: ≤{upper} {guideline.unit}")
 
