@@ -1,17 +1,21 @@
 """Basic Metadata Queries.
 
 Explore available parameters, media types, and data sources.
+
+Note: Some endpoints may have model/API response mismatches that need resolution.
+This example demonstrates workarounds using httpx directly where needed.
 """
 
+import httpx
+
 from guidelinely import (
-    get_stats,
     health_check,
     list_media,
     list_parameters,
-    list_sources,
     readiness_check,
     search_parameters,
 )
+from guidelinely.client import GUIDELINELY_API_BASE, DEFAULT_TIMEOUT, USER_AGENT
 
 
 def main():
@@ -50,8 +54,11 @@ def main():
     print()
 
     # View guideline sources and documents
+    # Note: Using httpx directly due to model/API response field name mismatch
     print("=== Guideline Sources (first source) ===")
-    sources = list_sources()
+    with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
+        response = client.get(f"{GUIDELINELY_API_BASE}/sources")
+        sources = response.json()
     if sources:
         print(f"Total sources: {len(sources)}")
         first_source = sources[0]
@@ -60,10 +67,15 @@ def main():
     print()
 
     # Get database statistics
+    # Note: Using httpx directly due to model/API response field name mismatch
     print("=== Database Statistics ===")
-    stats = get_stats()
-    for key, value in stats.items():
-        print(f"  {key}: {value}")
+    with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
+        response = client.get(f"{GUIDELINELY_API_BASE}/stats")
+        stats = response.json()
+    print(f"  parameters: {stats['parameters']}")
+    print(f"  guidelines: {stats['guidelines']}")
+    print(f"  sources: {stats['sources']}")
+    print(f"  documents: {stats['documents']}")
 
 
 if __name__ == "__main__":
