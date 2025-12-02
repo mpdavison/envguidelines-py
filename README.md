@@ -333,7 +333,7 @@ See the `examples/` directory for complete working examples:
 1. `01_basic_metadata.py` - Basic metadata queries
 2. `02_calculate_single_parameter.py` - Single parameter calculations
 3. `03_batch_calculations.py` - Batch calculations
-4. `04_soil_calculations.py` - Groundwater calculations (soil guidelines coming soon)
+4. `04_groundwater_calculations.py` - Groundwater calculations (soil guidelines coming soon)
 5. `05_advanced_workflow.py` - Advanced filtering and analysis
 
 ## Resources

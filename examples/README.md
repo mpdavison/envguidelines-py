@@ -7,7 +7,7 @@ Python examples demonstrating the Guidelinely API client library.
 1. **01_basic_metadata.py** - Basic metadata queries (health checks, parameter lists, sources)
 2. **02_calculate_single_parameter.py** - Calculate guidelines for a single parameter
 3. **03_batch_calculations.py** - Batch calculate multiple parameters
-4. **04_soil_calculations.py** - Soil-specific guideline calculations
+4. **04_groundwater_calculations.py** - Soil-specific guideline calculations
 5. **05_advanced_workflow.py** - Advanced filtering and analysis workflow
 
 ## Setup
