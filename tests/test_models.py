@@ -60,7 +60,6 @@ def test_guideline_response_optional_fields():
         "table": "Table 1",
         "application": "Freshwater guidelines",
         "basis": "Chronic toxicity",
-        "use_case": "Protection",
         "document": "CCME Water Quality Guidelines",
     }
 
@@ -68,6 +67,7 @@ def test_guideline_response_optional_fields():
     assert guideline.narrative is None
     assert guideline.lower is None
     assert guideline.upper is None
+    assert guideline.use_case is None  # Should be None when not provided
     assert guideline.context_index is None
 
 

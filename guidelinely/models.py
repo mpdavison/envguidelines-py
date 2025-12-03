@@ -46,7 +46,7 @@ class GuidelineResponse(BaseModel):
     calculation_used: Optional[str] = None
     formula_svg: Optional[str] = None
     narrative: Optional[str] = None  # Qualitative guidance text for narrative guidelines
-    use_case: str
+    use_case: Optional[str] = None
     source: str
     source_abbreviation: Optional[str] = None
     document: str

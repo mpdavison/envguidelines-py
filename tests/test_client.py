@@ -190,6 +190,8 @@ def test_calculate_guidelines(httpx_mock):
     assert result.results[0].parameter_specification == "Aluminum, Dissolved"
     assert result.results[0].is_calculated is True
     assert result.context["pH"] == "7.0 1"
+    # Verify use_case is present and correctly parsed
+    assert result.results[0].use_case == "Protection"
 
 
 def test_calculate_guidelines_with_api_key(httpx_mock):
@@ -274,6 +276,9 @@ def test_calculate_batch(httpx_mock):
 
     assert result.total_count == 2
     assert len(result.results) == 2
+    # Verify use_case is present in batch results
+    assert result.results[0].use_case == "Protection"
+    assert result.results[1].use_case == "Protection"
 
 
 def test_calculate_batch_with_unit_conversion(httpx_mock):
@@ -308,6 +313,54 @@ def test_calculate_batch_parameter_limit():
 
     with pytest.raises(ValueError, match="Maximum 50 parameters"):
         calculate_batch(params, "surface_water")
+
+
+def test_use_case_present_in_responses(httpx_mock):
+    """Test that use_case field is present and correctly parsed in API responses."""
+    cache.clear()  # Clear cache to ensure HTTP call is made
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{API_BASE}/calculate",
+        json={
+            "results": [
+                {
+                    "id": 1,
+                    "parameter": "Aluminum",
+                    "parameter_specification": "Aluminum, Dissolved",
+                    "media": "surface_water",
+                    "value": "[87.0 μg/L,100 μg/L]",
+                    "lower": 87.0,
+                    "upper": 100.0,
+                    "unit": "μg/L",
+                    "is_calculated": True,
+                    "source": "CCME",
+                    "receptor": "Aquatic Life",
+                    "exposure_duration": "chronic",
+                    "purpose": "long_term",
+                    "table": "Table 1",
+                    "application": "Freshwater guidelines",
+                    "basis": "Chronic toxicity",
+                    "use_case": "Protection",
+                    "document": "CCME Water Quality Guidelines",
+                }
+            ],
+            "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
+            "total_count": 1,
+        },
+        status_code=200,
+    )
+
+    result = calculate_guidelines(
+        parameter="Aluminum",
+        media="surface_water",
+        context={"pH": "7.0 1", "hardness": "100 mg/L"},
+        api_key="dummy",
+    )
+
+    # Verify use_case is present and has expected value
+    assert hasattr(result.results[0], "use_case")
+    assert result.results[0].use_case == "Protection"
+    assert result.results[0].use_case is not None
 
 
 def test_error_handling(httpx_mock):
