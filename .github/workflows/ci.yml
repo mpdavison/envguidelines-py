@@ -87,6 +87,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Fetch all history and tags for setuptools_scm versioning
+        ref: ${{ github.ref }}  # Ensure we checkout the exact ref (tag or branch)
 
     - name: Set up Python
       uses: actions/setup-python@v5
