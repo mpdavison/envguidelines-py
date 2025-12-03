@@ -378,6 +378,7 @@ def calculate_guidelines(
     media: str,
     context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None,
     target_unit: Optional[str] = None,
+    include_formula_svg: bool = False,
     api_key: Optional[str] = None,
 ) -> CalculationResponse:
     """Calculate guidelines for a parameter.
@@ -395,6 +396,8 @@ def calculate_guidelines(
             For soil: pH ("6.5 1"), organic_matter ("3.5 %"),
                      cation_exchange_capacity ("15 meq/100g")
         target_unit: Optional unit to convert result to (e.g., "mg/L", "μg/L").
+        include_formula_svg: Whether to include SVG formula representations in the response.
+            Default is False to reduce response size.
         api_key: Optional API key. If None, will use GUIDELINELY_API_KEY environment variable.
 
     Returns:
@@ -444,6 +447,7 @@ def calculate_guidelines(
         "media": media,
         "context": _normalize_context_for_cache(context),
         "target_unit": target_unit,
+        "include_formula_svg": include_formula_svg,
     }
 
     # Check cache first
@@ -461,6 +465,8 @@ def calculate_guidelines(
         body["context"] = context
     if target_unit:
         body["target_unit"] = target_unit
+    if include_formula_svg:
+        body["include_formula_svg"] = include_formula_svg
 
     headers: dict[str, str] = {}
     if key:
@@ -493,6 +499,7 @@ def calculate_batch(
     parameters: list[Union[str, dict[str, Any]]],
     media: str,
     context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None,
+    include_formula_svg: bool = False,
     api_key: Optional[str] = None,
 ) -> CalculationResponse:
     """Batch calculate guidelines for multiple parameters.
@@ -506,6 +513,8 @@ def calculate_batch(
         media: Media type (e.g., "surface_water", "soil").
         context: Environmental parameters as strings with units. Can be a single dict
             or a list of dicts for multiple calculations with different contexts.
+        include_formula_svg: Whether to include SVG formula representations in the response.
+            Default is False to reduce response size.
         api_key: Optional API key. If None, will use GUIDELINELY_API_KEY environment variable.
 
     Returns:
@@ -566,6 +575,7 @@ def calculate_batch(
         "parameters": _normalize_parameters_for_cache(parameters),
         "media": media,
         "context": _normalize_context_for_cache(context),
+        "include_formula_svg": include_formula_svg,
     }
 
     # Check cache first
@@ -581,6 +591,8 @@ def calculate_batch(
 
     if context:
         body["context"] = context
+    if include_formula_svg:
+        body["include_formula_svg"] = include_formula_svg
 
     headers: dict[str, str] = {}
     if key:

@@ -27,7 +27,7 @@ def main():
         parameter="Aluminum, Dissolved",
         media="surface_water",
         context={
-            "hardness": "100 mg/L",  # 100 mg/L as CaCO3
+            "pH": "7.5 1",  # pH value (unitless, use "1" as unit)
         },
     )
 
@@ -59,7 +59,7 @@ def main():
     result_mg = calculate_guidelines(
         parameter="Aluminum, Dissolved",
         media="surface_water",
-        context={"hardness": "100 mg/L"},
+        context={"pH": "7.5 1"},
         target_unit="mg/L",  # Convert to mg/L
     )
 

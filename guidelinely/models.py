@@ -74,6 +74,7 @@ class CalculateRequest(BaseModel):
     # Single context dict or list of dicts for multiple contexts
     context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None
     target_unit: Optional[str] = None  # Optional unit conversion
+    include_formula_svg: bool = False  # Whether to include SVG formula representations
 
 
 class ParameterWithUnit(BaseModel):
@@ -90,6 +91,7 @@ class BatchCalculateRequest(BaseModel):
     media: str
     # Single context dict or list of dicts for multiple contexts
     context: Optional[Union[dict[str, str], list[dict[str, str]]]] = None
+    include_formula_svg: bool = False  # Whether to include SVG formula representations
 
     @model_validator(mode="after")
     def validate_parameter_count(self) -> "BatchCalculateRequest":
