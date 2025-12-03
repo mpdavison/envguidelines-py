@@ -75,6 +75,35 @@ def _normalize_context_for_cache(
     return tuple(sorted(context.items()))
 
 
+def _normalize_parameters_for_cache(
+    parameters: list[Union[str, dict[str, Any]]],
+) -> tuple[Union[str, tuple[tuple[str, Any], ...]], ...]:
+    """Normalize parameters list for consistent cache key generation.
+
+    Sorts parameters and converts parameter dicts to sorted tuples so that cache keys
+    are consistent regardless of the order parameters were provided by the caller.
+
+    Args:
+        parameters: List of parameter names (strings) or parameter dicts.
+
+    Returns:
+        Tuple of normalized and sorted parameters.
+    """
+    normalized: list[Union[str, tuple[tuple[str, Any], ...]]] = []
+    for param in parameters:
+        if isinstance(param, str):
+            normalized.append(param)
+        elif isinstance(param, dict):
+            # Sort dict items for consistent ordering
+            normalized.append(tuple(sorted(param.items())))
+        else:
+            # Fallback - just use as-is (shouldn't happen with proper validation)
+            normalized.append(param)
+
+    # Sort the entire list to ensure parameter order doesn't affect cache keys
+    return tuple(sorted(normalized, key=lambda x: (0 if isinstance(x, str) else 1, x)))
+
+
 def health_check() -> dict[str, Any]:
     """Check if the API service is running.
 
@@ -495,10 +524,11 @@ def calculate_batch(
     logger.debug(f"Batch calculating {len(parameters)} parameters in {media}")
 
     # Prepare cache key (excludes api_key for security - keys should not be stored on disk)
-    # Context is normalized (sorted) to ensure consistent cache hits regardless of key order
+    # Context and parameters are normalized (sorted) to ensure consistent cache hits
+    # regardless of key order
     cache_key = {
         "endpoint": "calculate/batch",
-        "parameters": parameters,
+        "parameters": _normalize_parameters_for_cache(parameters),
         "media": media,
         "context": _normalize_context_for_cache(context),
     }

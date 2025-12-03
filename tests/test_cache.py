@@ -112,6 +112,61 @@ class TestCacheKeyNormalization:
         # Should be hashable (can be used in sets/dict keys)
         hash(normalized)
 
+    def test_normalize_parameters_strings_order_independent(self):
+        """Parameter string lists with different orders should produce same normalized key."""
+        from guidelinely.client import _normalize_parameters_for_cache
+
+        params1 = ["Aluminum", "Copper", "Lead"]
+        params2 = ["Copper", "Lead", "Aluminum"]
+        params3 = ["Lead", "Aluminum", "Copper"]
+
+        normalized1 = _normalize_parameters_for_cache(params1)
+        normalized2 = _normalize_parameters_for_cache(params2)
+        normalized3 = _normalize_parameters_for_cache(params3)
+
+        # Parameters should be sorted alphabetically for consistent cache keys
+        assert normalized1 == normalized2 == normalized3
+        assert normalized1 == ("Aluminum", "Copper", "Lead")
+
+    def test_normalize_parameters_dicts_order_independent(self):
+        """Parameter dicts with different key orders should produce same normalized key."""
+        from guidelinely.client import _normalize_parameters_for_cache
+
+        params1 = [
+            "Aluminum",
+            {"name": "Copper", "target_unit": "μg/L"},
+            {"name": "Lead", "target_unit": "mg/L"},
+        ]
+        params2 = [
+            "Aluminum",
+            {"target_unit": "μg/L", "name": "Copper"},  # Different key order
+            {"target_unit": "mg/L", "name": "Lead"},  # Different key order
+        ]
+
+        normalized1 = _normalize_parameters_for_cache(params1)
+        normalized2 = _normalize_parameters_for_cache(params2)
+
+        assert normalized1 == normalized2
+
+    def test_normalize_parameters_mixed_types(self):
+        """Mixed parameter types should be normalized correctly."""
+        from guidelinely.client import _normalize_parameters_for_cache
+
+        params = [
+            "Aluminum",  # String
+            {"name": "Copper", "target_unit": "μg/L"},  # Dict
+            "Lead",  # String
+        ]
+
+        normalized = _normalize_parameters_for_cache(params)
+
+        expected = (
+            "Aluminum",
+            "Lead",
+            (("name", "Copper"), ("target_unit", "μg/L")),
+        )
+        assert normalized == expected
+
     def test_cache_hit_with_reordered_context(self, httpx_mock):
         """Cache should hit when same context is provided with different key order."""
         from guidelinely import calculate_guidelines
@@ -140,6 +195,78 @@ class TestCacheKeyNormalization:
             parameter="Aluminum",
             media="surface_water",
             context={"hardness": "100 mg/L", "pH": "7.0 1"},
+            api_key="test_key",
+        )
+
+        # Only one HTTP request should have been made (second was cache hit)
+        requests = httpx_mock.get_requests()
+        assert len(requests) == 1
+
+    def test_cache_hit_with_reordered_parameter_dicts(self, httpx_mock):
+        """Cache should hit when parameter dicts have different key orders."""
+        from guidelinely import calculate_batch
+        from guidelinely.cache import cache
+
+        cache.clear()
+
+        # Mock API response
+        httpx_mock.add_response(
+            method="POST",
+            url="https://guidelines.1681248.com/api/v1/calculate/batch",
+            json={"results": [], "context": {}, "total_count": 0},
+            status_code=200,
+        )
+
+        # First call with parameter dict keys in one order
+        calculate_batch(
+            parameters=[
+                "Aluminum",
+                {"name": "Copper", "target_unit": "μg/L"},
+            ],
+            media="surface_water",
+            api_key="test_key",
+        )
+
+        # Second call with parameter dict keys in different order - should use cache
+        calculate_batch(
+            parameters=[
+                "Aluminum",
+                {"target_unit": "μg/L", "name": "Copper"},  # Reordered keys
+            ],
+            media="surface_water",
+            api_key="test_key",
+        )
+
+        # Only one HTTP request should have been made (second was cache hit)
+        requests = httpx_mock.get_requests()
+        assert len(requests) == 1
+
+    def test_cache_hit_with_reordered_parameters(self, httpx_mock):
+        """Cache should hit when parameters are provided in different order."""
+        from guidelinely import calculate_batch
+        from guidelinely.cache import cache
+
+        cache.clear()
+
+        # Mock API response
+        httpx_mock.add_response(
+            method="POST",
+            url="https://guidelines.1681248.com/api/v1/calculate/batch",
+            json={"results": [], "context": {}, "total_count": 0},
+            status_code=200,
+        )
+
+        # First call with parameters in one order
+        calculate_batch(
+            parameters=["Aluminum", "Copper", "Lead"],
+            media="surface_water",
+            api_key="test_key",
+        )
+
+        # Second call with parameters in different order - should use cache
+        calculate_batch(
+            parameters=["Copper", "Lead", "Aluminum"],  # Different order
+            media="surface_water",
             api_key="test_key",
         )
 
