@@ -55,7 +55,6 @@ include = ["guidelinely*"]
 
 [tool.setuptools_scm]
 write_to = "guidelinely/_version.py"
-local_scheme = "no-local-version"
 
 [tool.black]
 line-length = 100
