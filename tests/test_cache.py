@@ -59,6 +59,95 @@ class TestCacheOperations:
         assert temp_cache.get(key) == value
 
 
+class TestCacheKeyNormalization:
+    """Test cache key normalization for consistent cache hits."""
+
+    def test_normalize_context_single_dict_order_independent(self):
+        """Same context with different key order should produce same normalized key."""
+        from guidelinely.client import _normalize_context_for_cache
+
+        context1 = {"pH": "7.0 1", "hardness": "100 mg/L", "temperature": "20 °C"}
+        context2 = {"temperature": "20 °C", "pH": "7.0 1", "hardness": "100 mg/L"}
+        context3 = {"hardness": "100 mg/L", "temperature": "20 °C", "pH": "7.0 1"}
+
+        normalized1 = _normalize_context_for_cache(context1)
+        normalized2 = _normalize_context_for_cache(context2)
+        normalized3 = _normalize_context_for_cache(context3)
+
+        assert normalized1 == normalized2 == normalized3
+
+    def test_normalize_context_list_of_dicts_order_independent(self):
+        """List of contexts with different key orders should produce same normalized key."""
+        from guidelinely.client import _normalize_context_for_cache
+
+        context1 = [
+            {"pH": "7.0 1", "hardness": "100 mg/L"},
+            {"pH": "8.0 1", "hardness": "200 mg/L"},
+        ]
+        context2 = [
+            {"hardness": "100 mg/L", "pH": "7.0 1"},
+            {"hardness": "200 mg/L", "pH": "8.0 1"},
+        ]
+
+        normalized1 = _normalize_context_for_cache(context1)
+        normalized2 = _normalize_context_for_cache(context2)
+
+        assert normalized1 == normalized2
+
+    def test_normalize_context_none_returns_none(self):
+        """None context should return None."""
+        from guidelinely.client import _normalize_context_for_cache
+
+        assert _normalize_context_for_cache(None) is None
+
+    def test_normalize_context_produces_hashable_result(self):
+        """Normalized context should be hashable (tuples, not dicts)."""
+        from guidelinely.client import _normalize_context_for_cache
+
+        context = {"pH": "7.0 1", "hardness": "100 mg/L"}
+        normalized = _normalize_context_for_cache(context)
+
+        # Should be a tuple, not a dict
+        assert isinstance(normalized, tuple)
+        # Should be hashable (can be used in sets/dict keys)
+        hash(normalized)
+
+    def test_cache_hit_with_reordered_context(self, httpx_mock):
+        """Cache should hit when same context is provided with different key order."""
+        from guidelinely import calculate_guidelines
+        from guidelinely.cache import cache
+
+        cache.clear()
+
+        # Mock API response
+        httpx_mock.add_response(
+            method="POST",
+            url="https://guidelines.1681248.com/api/v1/calculate",
+            json={"results": [], "context": {}, "total_count": 0},
+            status_code=200,
+        )
+
+        # First call with context keys in one order
+        calculate_guidelines(
+            parameter="Aluminum",
+            media="surface_water",
+            context={"pH": "7.0 1", "hardness": "100 mg/L"},
+            api_key="test_key",
+        )
+
+        # Second call with context keys in different order - should use cache
+        calculate_guidelines(
+            parameter="Aluminum",
+            media="surface_water",
+            context={"hardness": "100 mg/L", "pH": "7.0 1"},
+            api_key="test_key",
+        )
+
+        # Only one HTTP request should have been made (second was cache hit)
+        requests = httpx_mock.get_requests()
+        assert len(requests) == 1
+
+
 class TestCacheConfiguration:
     """Test cache directory configuration."""
 

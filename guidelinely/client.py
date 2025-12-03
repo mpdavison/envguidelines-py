@@ -52,6 +52,29 @@ def _handle_error(response: httpx.Response) -> None:
     raise GuidelinelyAPIError(message, response.status_code)
 
 
+def _normalize_context_for_cache(
+    context: Optional[Union[dict[str, str], list[dict[str, str]]]],
+) -> Optional[Union[tuple[tuple[str, str], ...], tuple[tuple[tuple[str, str], ...], ...]]]:
+    """Normalize context for consistent cache key generation.
+
+    Converts context dicts to sorted tuples so that cache keys are consistent
+    regardless of the order keys were provided by the caller.
+
+    Args:
+        context: Single context dict, list of context dicts, or None.
+
+    Returns:
+        Normalized context as sorted tuples, or None if context is None.
+    """
+    if context is None:
+        return None
+    if isinstance(context, list):
+        # List of context dicts - sort each dict and convert to tuple of tuples
+        return tuple(tuple(sorted(ctx.items())) for ctx in context)
+    # Single context dict - sort and convert to tuple of tuples
+    return tuple(sorted(context.items()))
+
+
 def health_check() -> dict[str, Any]:
     """Check if the API service is running.
 
@@ -355,11 +378,12 @@ def calculate_guidelines(
     logger.debug(f"Calculating guidelines for {parameter} in {media}")
 
     # Prepare cache key (excludes api_key for security - keys should not be stored on disk)
+    # Context is normalized (sorted) to ensure consistent cache hits regardless of key order
     cache_key = {
         "endpoint": "calculate",
         "parameter": parameter,
         "media": media,
-        "context": context,
+        "context": _normalize_context_for_cache(context),
         "target_unit": target_unit,
     }
 
@@ -471,11 +495,12 @@ def calculate_batch(
     logger.debug(f"Batch calculating {len(parameters)} parameters in {media}")
 
     # Prepare cache key (excludes api_key for security - keys should not be stored on disk)
+    # Context is normalized (sorted) to ensure consistent cache hits regardless of key order
     cache_key = {
         "endpoint": "calculate/batch",
         "parameters": parameters,
         "media": media,
-        "context": context,
+        "context": _normalize_context_for_cache(context),
     }
 
     # Check cache first
