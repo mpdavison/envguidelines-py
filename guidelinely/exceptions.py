@@ -5,7 +5,12 @@ allowing callers to catch specific exception types and access
 error details like HTTP status codes.
 """
 
-__all__ = ["GuidelinelyError", "GuidelinelyAPIError", "GuidelinelyTimeoutError"]
+__all__ = [
+    "GuidelinelyError",
+    "GuidelinelyAPIError",
+    "GuidelinelyTimeoutError",
+    "GuidelinelyConnectionError",
+]
 
 
 class GuidelinelyError(Exception):
@@ -77,6 +82,22 @@ class GuidelinelyTimeoutError(GuidelinelyError):
             result = calculate_guidelines(...)
         except GuidelinelyTimeoutError:
             print("Request timed out, please try again")
+    """
+
+    pass
+
+
+class GuidelinelyConnectionError(GuidelinelyError):
+    """Raised when unable to connect to the API.
+
+    This exception wraps httpx.TransportError (which includes ConnectError,
+    NetworkError, ReadError, etc.) to provide a consistent exception hierarchy.
+
+    Example:
+        try:
+            result = calculate_guidelines(...)
+        except GuidelinelyConnectionError:
+            print("Could not connect to the API, check your network connection")
     """
 
     pass

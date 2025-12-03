@@ -82,6 +82,50 @@ def test_search_parameters_with_media_filter(httpx_mock):
     assert "Copper" in results
 
 
+def test_search_parameters_with_source_filter(httpx_mock):
+    """Test parameter search with source filter."""
+    httpx_mock.add_response(
+        method="GET",
+        url=f"{API_BASE}/parameters/search?q=aluminum&source=AEPA",
+        json=["Aluminum"],
+        status_code=200,
+    )
+
+    results = search_parameters("aluminum", source=["AEPA"])
+    assert len(results) == 1
+    assert "Aluminum" in results
+
+
+def test_search_parameters_with_document_filter(httpx_mock):
+    """Test parameter search with document filter."""
+    httpx_mock.add_response(
+        method="GET",
+        url=f"{API_BASE}/parameters/search?q=zinc&document=PAL",
+        json=["Zinc"],
+        status_code=200,
+    )
+
+    results = search_parameters("zinc", document=["PAL"])
+    assert len(results) == 1
+    assert "Zinc" in results
+
+
+def test_search_parameters_with_all_filters(httpx_mock):
+    """Test parameter search with media, source, and document filters combined."""
+    httpx_mock.add_response(
+        method="GET",
+        url=f"{API_BASE}/parameters/search?q=aluminum&media=groundwater&source=AEPA&document=PAL",
+        json=["Aluminum"],
+        status_code=200,
+    )
+
+    results = search_parameters(
+        "aluminum", media=["groundwater"], source=["AEPA"], document=["PAL"]
+    )
+    assert len(results) == 1
+    assert "Aluminum" in results
+
+
 def test_list_media(httpx_mock):
     """Test listing media types."""
     httpx_mock.add_response(
@@ -107,7 +151,7 @@ def test_list_sources(httpx_mock):
                 "name": "CCME",
                 "abbreviation": "CCME",
                 "documents": [
-                    {"id": 1, "title": "Canadian Water Quality Guidelines", "year": 2021}
+                    {"id": 1, "name": "Canadian Water Quality Guidelines", "abbreviation": "CWQG"}
                 ],
             }
         ],
@@ -119,7 +163,7 @@ def test_list_sources(httpx_mock):
     assert sources[0].name == "CCME"
     assert sources[0].abbreviation == "CCME"
     assert len(sources[0].documents) == 1
-    assert sources[0].documents[0].title == "Canadian Water Quality Guidelines"
+    assert sources[0].documents[0].name == "Canadian Water Quality Guidelines"
 
 
 def test_get_stats(httpx_mock):
@@ -128,19 +172,19 @@ def test_get_stats(httpx_mock):
         method="GET",
         url=f"{API_BASE}/stats",
         json={
-            "total_parameters": 50,
-            "total_guidelines": 1000,
-            "total_sources": 10,
-            "total_documents": 25,
+            "parameters": 50,
+            "guidelines": 1000,
+            "sources": 10,
+            "documents": 25,
         },
         status_code=200,
     )
 
     stats = get_stats()
-    assert stats.total_parameters == 50
-    assert stats.total_guidelines == 1000
-    assert stats.total_sources == 10
-    assert stats.total_documents == 25
+    assert stats.parameters == 50
+    assert stats.guidelines == 1000
+    assert stats.sources == 10
+    assert stats.documents == 25
 
 
 def test_calculate_guidelines(httpx_mock):

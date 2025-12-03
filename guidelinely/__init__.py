@@ -18,6 +18,7 @@ from guidelinely.client import (
 )
 from guidelinely.exceptions import (
     GuidelinelyAPIError,
+    GuidelinelyConnectionError,
     GuidelinelyError,
     GuidelinelyTimeoutError,
 )
@@ -32,7 +33,7 @@ from guidelinely.models import (
 try:
     from guidelinely._version import __version__
 except ImportError:
-    __version__ = "0.0.0.dev0"  # Fallback for editable installs without build
+    __version__ = "0.0.0"  # Fallback for editable installs without build
 
 __all__ = [
     # Client functions
@@ -54,6 +55,7 @@ __all__ = [
     # Exceptions
     "GuidelinelyError",
     "GuidelinelyAPIError",
+    "GuidelinelyConnectionError",
     "GuidelinelyTimeoutError",
     # Auth
     "get_api_key",

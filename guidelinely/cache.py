@@ -41,14 +41,13 @@ def get_cached(key_data: dict[str, Any]) -> Optional[dict[str, Any]]:
     return cast(dict[str, Any], result)
 
 
-def set_cached(key_data: dict[str, Any], value: dict[str, Any], ttl: Optional[int] = None) -> None:
+def set_cached(key_data: dict[str, Any], value: dict[str, Any], ttl: int = DEFAULT_TTL) -> None:
     """Store response in cache for given request data with TTL.
 
     Args:
         key_data: Cache key (typically dict of request parameters)
         value: Response data to cache
-        ttl: Time to live in seconds (default: DEFAULT_TTL, 7 days)
+        ttl: Time to live in seconds. Defaults to DEFAULT_TTL (7 days),
+            which can be configured via GUIDELINELY_CACHE_TTL environment variable.
     """
-    if ttl is None:
-        ttl = DEFAULT_TTL
     cache.set(key_data, value, expire=ttl)

@@ -12,7 +12,11 @@ import httpx
 
 from guidelinely.auth import get_api_key
 from guidelinely.cache import get_cached, set_cached
-from guidelinely.exceptions import GuidelinelyAPIError, GuidelinelyTimeoutError
+from guidelinely.exceptions import (
+    GuidelinelyAPIError,
+    GuidelinelyConnectionError,
+    GuidelinelyTimeoutError,
+)
 from guidelinely.models import (
     CalculationResponse,
     SourceResponse,
@@ -28,8 +32,11 @@ GUIDELINELY_API_BASE = "https://guidelines.1681248.com/api/v1"
 # Default timeout for HTTP requests (in seconds), configurable via environment variable
 DEFAULT_TIMEOUT = float(os.getenv("GUIDELINELY_TIMEOUT", "30.0"))
 
-# Package version for User-Agent header (duplicated from __init__.py to avoid circular import)
-__version__ = "0.1.0"
+# Package version for User-Agent header
+try:
+    from guidelinely._version import __version__
+except ImportError:
+    __version__ = "0.0.0"
 
 # User-Agent header for API request identification
 USER_AGENT = f"guidelinely-python/{__version__}"
@@ -132,6 +139,9 @@ def health_check() -> dict[str, Any]:
     except httpx.TimeoutException as e:
         logger.warning(f"Health check timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Health check connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def readiness_check() -> dict[str, Any]:
@@ -162,6 +172,9 @@ def readiness_check() -> dict[str, Any]:
     except httpx.TimeoutException as e:
         logger.warning(f"Readiness check timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Readiness check connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def list_parameters() -> list[str]:
@@ -191,6 +204,9 @@ def list_parameters() -> list[str]:
     except httpx.TimeoutException as e:
         logger.warning(f"List parameters timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"List parameters connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def search_parameters(
@@ -254,6 +270,9 @@ def search_parameters(
     except httpx.TimeoutException as e:
         logger.warning(f"Search parameters timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Search parameters connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def list_media() -> dict[str, str]:
@@ -283,6 +302,9 @@ def list_media() -> dict[str, str]:
     except httpx.TimeoutException as e:
         logger.warning(f"List media timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"List media connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def list_sources() -> list[SourceResponse]:
@@ -300,7 +322,7 @@ def list_sources() -> list[SourceResponse]:
     Example:
         sources = list_sources()
         print(sources[0].name)  # e.g., 'CCME'
-        print(sources[0].documents[0].title)
+        print(sources[0].documents[0].name)
     """
     logger.debug("Listing all sources")
     try:
@@ -313,6 +335,9 @@ def list_sources() -> list[SourceResponse]:
     except httpx.TimeoutException as e:
         logger.warning(f"List sources timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"List sources connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def get_stats() -> StatsResponse:
@@ -321,7 +346,7 @@ def get_stats() -> StatsResponse:
     Get statistics about the guideline database (counts of sources, documents, etc.).
 
     Returns:
-        StatsResponse with total_parameters, total_guidelines, total_sources, total_documents.
+        StatsResponse with parameters, guidelines, sources, documents counts.
 
     Raises:
         GuidelinelyAPIError: If the API returns an error response.
@@ -329,8 +354,8 @@ def get_stats() -> StatsResponse:
 
     Example:
         stats = get_stats()
-        print(f"Total parameters: {stats.total_parameters}")
-        print(f"Total guidelines: {stats.total_guidelines}")
+        print(f"Total parameters: {stats.parameters}")
+        print(f"Total guidelines: {stats.guidelines}")
     """
     logger.debug("Getting database statistics")
     try:
@@ -343,6 +368,9 @@ def get_stats() -> StatsResponse:
     except httpx.TimeoutException as e:
         logger.warning(f"Get stats timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Get stats connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def calculate_guidelines(
@@ -379,29 +407,31 @@ def calculate_guidelines(
         GuidelinelyTimeoutError: If the request times out.
 
     Example:
-        >>> import os
-        >>> os.environ["GUIDELINELY_API_KEY"] = "your_key"
-        >>>
-        >>> # Single context
-        >>> result = calculate_guidelines(
-        ...     parameter="Aluminum",
-        ...     media="surface_water",
-        ...     context={"pH": "7.0 1", "hardness": "100 mg/L"}
-        ... )
-        >>>
-        >>> # Multiple contexts - compare across conditions
-        >>> result = calculate_guidelines(
-        ...     parameter="Aluminum",
-        ...     media="surface_water",
-        ...     context=[
-        ...         {"pH": "7.0 1", "hardness": "100 mg/L"},
-        ...         {"pH": "8.0 1", "hardness": "200 mg/L"}
-        ...     ]
-        ... )
-        >>>
-        >>> print(f"Total: {result.total_count}")
-        >>> for guideline in result.results:
-        ...     print(f"{guideline.parameter}: {guideline.value} ({guideline.source})")
+        ::
+
+            import os
+            os.environ["GUIDELINELY_API_KEY"] = "your_key"
+
+            # Single context
+            result = calculate_guidelines(
+                parameter="Aluminum",
+                media="surface_water",
+                context={"pH": "7.0 1", "hardness": "100 mg/L"}
+            )
+
+            # Multiple contexts - compare across conditions
+            result = calculate_guidelines(
+                parameter="Aluminum",
+                media="surface_water",
+                context=[
+                    {"pH": "7.0 1", "hardness": "100 mg/L"},
+                    {"pH": "8.0 1", "hardness": "200 mg/L"}
+                ]
+            )
+
+            print(f"Total: {result.total_count}")
+            for guideline in result.results:
+                print(f"{guideline.parameter}: {guideline.value} ({guideline.source})")
     """
     key = get_api_key(api_key)
     logger.debug(f"Calculating guidelines for {parameter} in {media}")
@@ -432,7 +462,7 @@ def calculate_guidelines(
     if target_unit:
         body["target_unit"] = target_unit
 
-    headers = {"User-Agent": USER_AGENT}
+    headers: dict[str, str] = {}
     if key:
         headers["X-API-KEY"] = key
 
@@ -441,7 +471,7 @@ def calculate_guidelines(
             response = client.post(
                 f"{GUIDELINELY_API_BASE}/calculate",
                 json=body,
-                headers=headers,
+                headers=headers if headers else None,
             )
             logger.debug(f"Calculate response: {response.status_code}")
             if response.status_code != 200:
@@ -454,6 +484,9 @@ def calculate_guidelines(
     except httpx.TimeoutException as e:
         logger.warning(f"Calculate guidelines timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Calculate guidelines connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
 def calculate_batch(
@@ -486,36 +519,38 @@ def calculate_batch(
         GuidelinelyTimeoutError: If the request times out.
 
     Example:
-        >>> import os
-        >>> os.environ["GUIDELINELY_API_KEY"] = "your_key"
-        >>>
-        >>> # Calculate multiple metals in surface water
-        >>> results = calculate_batch(
-        ...     parameters=["Aluminum", "Copper", "Lead"],
-        ...     media="surface_water",
-        ...     context={"pH": "7.0 1", "hardness": "100 mg/L"}
-        ... )
-        >>>
-        >>> # Multiple contexts - compare across conditions
-        >>> results = calculate_batch(
-        ...     parameters=["Aluminum", "Copper"],
-        ...     media="surface_water",
-        ...     context=[
-        ...         {"pH": "7.0 1", "hardness": "100 mg/L"},
-        ...         {"pH": "8.0 1", "hardness": "200 mg/L"}
-        ...     ]
-        ... )
-        >>>
-        >>> # With per-parameter unit conversion
-        >>> results = calculate_batch(
-        ...     parameters=[
-        ...         "Aluminum",
-        ...         {"name": "Copper", "target_unit": "μg/L"},
-        ...         {"name": "Lead", "target_unit": "mg/L"}
-        ...     ],
-        ...     media="surface_water",
-        ...     context={"pH": "7.5 1", "hardness": "150 mg/L", "temperature": "15 °C"}
-        ... )
+        ::
+
+            import os
+            os.environ["GUIDELINELY_API_KEY"] = "your_key"
+
+            # Calculate multiple metals in surface water
+            results = calculate_batch(
+                parameters=["Aluminum", "Copper", "Lead"],
+                media="surface_water",
+                context={"pH": "7.0 1", "hardness": "100 mg/L"}
+            )
+
+            # Multiple contexts - compare across conditions
+            results = calculate_batch(
+                parameters=["Aluminum", "Copper"],
+                media="surface_water",
+                context=[
+                    {"pH": "7.0 1", "hardness": "100 mg/L"},
+                    {"pH": "8.0 1", "hardness": "200 mg/L"}
+                ]
+            )
+
+            # With per-parameter unit conversion
+            results = calculate_batch(
+                parameters=[
+                    "Aluminum",
+                    {"name": "Copper", "target_unit": "μg/L"},
+                    {"name": "Lead", "target_unit": "mg/L"}
+                ],
+                media="surface_water",
+                context={"pH": "7.5 1", "hardness": "150 mg/L", "temperature": "15 °C"}
+            )
     """
     if len(parameters) > 50:
         raise ValueError("Maximum 50 parameters per batch request")
@@ -547,7 +582,7 @@ def calculate_batch(
     if context:
         body["context"] = context
 
-    headers = {"User-Agent": USER_AGENT}
+    headers: dict[str, str] = {}
     if key:
         headers["X-API-KEY"] = key
 
@@ -556,7 +591,7 @@ def calculate_batch(
             response = client.post(
                 f"{GUIDELINELY_API_BASE}/calculate/batch",
                 json=body,
-                headers=headers,
+                headers=headers if headers else None,
             )
             logger.debug(f"Batch calculate response: {response.status_code}")
             if response.status_code != 200:
@@ -569,3 +604,6 @@ def calculate_batch(
     except httpx.TimeoutException as e:
         logger.warning(f"Batch calculate timed out: {e}")
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Batch calculate connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e

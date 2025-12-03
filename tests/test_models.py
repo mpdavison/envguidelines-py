@@ -168,11 +168,11 @@ def test_source_response_valid():
         "documents": [
             {
                 "id": 1,
-                "title": "Canadian Water Quality Guidelines",
-                "year": 2021,
+                "name": "Canadian Water Quality Guidelines",
+                "abbreviation": "CWQG",
                 "url": "https://example.com",
             },
-            {"id": 2, "title": "Canadian Soil Quality Guidelines", "year": 2020},
+            {"id": 2, "name": "Canadian Soil Quality Guidelines", "abbreviation": "CSQG"},
         ],
     }
 
@@ -181,33 +181,33 @@ def test_source_response_valid():
     assert source.name == "Canadian Council of Ministers of the Environment"
     assert source.abbreviation == "CCME"
     assert len(source.documents) == 2
-    assert source.documents[0].title == "Canadian Water Quality Guidelines"
-    assert source.documents[0].year == 2021
+    assert source.documents[0].name == "Canadian Water Quality Guidelines"
+    assert source.documents[0].abbreviation == "CWQG"
     assert source.documents[0].url == "https://example.com"
     assert source.documents[1].url is None
 
 
 def test_source_document_optional_fields():
     """Test SourceDocument with optional fields."""
-    data = {"id": 1, "title": "Test Document"}
+    data = {"id": 1, "name": "Test Document"}
     doc = SourceDocument(**data)
     assert doc.id == 1
-    assert doc.title == "Test Document"
-    assert doc.year is None
+    assert doc.name == "Test Document"
+    assert doc.abbreviation is None
     assert doc.url is None
 
 
 def test_stats_response_valid():
     """Test creating a valid StatsResponse."""
     data = {
-        "total_parameters": 150,
-        "total_guidelines": 5000,
-        "total_sources": 12,
-        "total_documents": 45,
+        "parameters": 150,
+        "guidelines": 5000,
+        "sources": 12,
+        "documents": 45,
     }
 
     stats = StatsResponse(**data)
-    assert stats.total_parameters == 150
-    assert stats.total_guidelines == 5000
-    assert stats.total_sources == 12
-    assert stats.total_documents == 45
+    assert stats.parameters == 150
+    assert stats.guidelines == 5000
+    assert stats.sources == 12
+    assert stats.documents == 45

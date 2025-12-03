@@ -128,9 +128,9 @@ class SourceDocument(BaseModel):
     """Nested document information within a source."""
 
     id: int
-    title: str
+    name: str
     url: Optional[str] = None
-    year: Optional[int] = None
+    abbreviation: Optional[str] = None
 
 
 class SourceResponse(BaseModel):
@@ -145,7 +145,7 @@ class SourceResponse(BaseModel):
 class StatsResponse(BaseModel):
     """Database statistics response."""
 
-    total_parameters: int
-    total_guidelines: int
-    total_sources: int
-    total_documents: int
+    parameters: int
+    guidelines: int
+    sources: int
+    documents: int

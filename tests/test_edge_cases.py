@@ -19,7 +19,11 @@ from guidelinely import (
     search_parameters,
 )
 from guidelinely.cache import cache
-from guidelinely.exceptions import GuidelinelyAPIError, GuidelinelyTimeoutError
+from guidelinely.exceptions import (
+    GuidelinelyAPIError,
+    GuidelinelyConnectionError,
+    GuidelinelyTimeoutError,
+)
 
 API_BASE = "https://guidelines.1681248.com/api/v1"
 
@@ -56,6 +60,49 @@ class TestTimeoutHandling:
 
         with pytest.raises(GuidelinelyTimeoutError):
             calculate_guidelines(parameter="Aluminum", media="surface_water", api_key="test_key")
+
+
+class TestConnectionErrorHandling:
+    """Tests for network connection error scenarios."""
+
+    def test_health_check_connection_error(self, httpx_mock):
+        """Test that connection errors are properly wrapped."""
+        import httpx
+
+        httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
+
+        with pytest.raises(GuidelinelyConnectionError) as exc_info:
+            health_check()
+
+        assert "Connection failed" in str(exc_info.value)
+
+    def test_list_parameters_connection_error(self, httpx_mock):
+        """Test connection error handling for list_parameters."""
+        import httpx
+
+        httpx_mock.add_exception(httpx.ConnectError("Network unreachable"))
+
+        with pytest.raises(GuidelinelyConnectionError):
+            list_parameters()
+
+    def test_calculate_guidelines_connection_error(self, httpx_mock):
+        """Test connection error handling for calculate_guidelines."""
+        import httpx
+
+        cache.clear()
+        httpx_mock.add_exception(httpx.ConnectError("Connection refused"))
+
+        with pytest.raises(GuidelinelyConnectionError):
+            calculate_guidelines(parameter="Aluminum", media="surface_water", api_key="test_key")
+
+    def test_search_parameters_connection_error(self, httpx_mock):
+        """Test connection error handling for search_parameters."""
+        import httpx
+
+        httpx_mock.add_exception(httpx.RemoteProtocolError("Server disconnected"))
+
+        with pytest.raises(GuidelinelyConnectionError):
+            search_parameters("copper")
 
 
 class TestInvalidJsonResponses:
