@@ -11,13 +11,13 @@ This Python client mirrors the functionality of the [R client](https://github.co
 
 ## Features
 
-- ✅ **Metadata Queries**: List parameters, search, explore media types and sources
-- ✅ **Single Calculations**: Calculate guidelines for individual parameters
-- ✅ **Batch Calculations**: Efficiently calculate multiple parameters (up to 50)
-- ✅ **Context-Aware**: Support for pH, hardness, temperature, and other environmental factors
-- ✅ **Unit Conversion**: Optional target unit specification
-- ✅ **Type Safety**: Full Pydantic model support for request/response validation
-- ✅ **Comprehensive Tests**: Mock-based test suite with pytest-httpx
+- **Metadata Queries**: List parameters, search, explore media types and sources
+- **Single Calculations**: Calculate guidelines for individual parameters
+- **Batch Calculations**: Efficiently calculate multiple parameters (up to 50)
+- **Context-Aware**: Support for pH, hardness, temperature, and other environmental factors
+- **Unit Conversion**: Optional target unit specification
+- **Type Safety**: Full Pydantic model support for request/response validation
+- **Comprehensive Tests**: Mock-based test suite with pytest-httpx
 
 ## Installation
 
