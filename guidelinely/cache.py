@@ -27,12 +27,12 @@ DEFAULT_TTL = int(os.getenv("GUIDELINELY_CACHE_TTL", str(7 * 24 * 3600)))
 
 
 def get_cached(
-    key_data: Union[dict[str, Any], tuple[tuple[str, Any], ...]],
+    key_data: Union[str, dict[str, Any], tuple[tuple[str, Any], ...]],
 ) -> Optional[dict[str, Any]]:
     """Retrieve cached response for given request data.
 
     Args:
-        key_data: Cache key (dict of request parameters or normalized tuple)
+        key_data: Cache key (string, dict of request parameters, or normalized tuple)
 
     Returns:
         Cached response data if found, None otherwise
@@ -44,14 +44,14 @@ def get_cached(
 
 
 def set_cached(
-    key_data: Union[dict[str, Any], tuple[tuple[str, Any], ...]],
+    key_data: Union[str, dict[str, Any], tuple[tuple[str, Any], ...]],
     value: dict[str, Any],
     ttl: int = DEFAULT_TTL,
 ) -> None:
     """Store response in cache for given request data with TTL.
 
     Args:
-        key_data: Cache key (dict of request parameters or normalized tuple)
+        key_data: Cache key (string, dict of request parameters, or normalized tuple)
         value: Response data to cache
         ttl: Time to live in seconds. Defaults to DEFAULT_TTL (7 days),
             which can be configured via GUIDELINELY_CACHE_TTL environment variable.

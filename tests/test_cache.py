@@ -7,6 +7,232 @@ import pytest
 from diskcache import Cache
 
 
+class TestSortDataStructure:
+    """Test _sort_data_structure function for all data types."""
+
+    def test_sort_none(self):
+        """None should return 'None' string."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(None)
+        assert result == "None"
+        assert isinstance(result, str)
+
+    def test_sort_bool_true(self):
+        """Boolean True should return 'True' string."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(True)
+        assert result == "True"
+        assert isinstance(result, str)
+
+    def test_sort_bool_false(self):
+        """Boolean False should return 'False' string."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(False)
+        assert result == "False"
+        assert isinstance(result, str)
+
+    def test_sort_int(self):
+        """Integer should return string representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(42)
+        assert result == "42"
+        assert isinstance(result, str)
+
+    def test_sort_int_negative(self):
+        """Negative integer should return string representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(-42)
+        assert result == "-42"
+        assert isinstance(result, str)
+
+    def test_sort_int_zero(self):
+        """Zero should return '0' string."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(0)
+        assert result == "0"
+        assert isinstance(result, str)
+
+    def test_sort_float(self):
+        """Float should return formatted string representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(3.14)
+        assert result == "3.140000"
+        assert isinstance(result, str)
+
+    def test_sort_float_negative(self):
+        """Negative float should return formatted string representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(-3.14)
+        assert result == "-3.140000"
+        assert isinstance(result, str)
+
+    def test_sort_float_zero(self):
+        """Float zero should return formatted string."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(0.0)
+        assert result == "0.000000"
+        assert isinstance(result, str)
+
+    def test_sort_string(self):
+        """String should return itself."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure("test")
+        assert result == "test"
+        assert isinstance(result, str)
+
+    def test_sort_string_empty(self):
+        """Empty string should return empty string."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure("")
+        assert result == ""
+        assert isinstance(result, str)
+
+    def test_sort_dict_empty(self):
+        """Empty dict should return sorted representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure({})
+        assert result == "[]"
+        assert isinstance(result, str)
+
+    def test_sort_dict_single_key(self):
+        """Single key dict should return sorted representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure({"key": "value"})
+        assert "key" in result
+        assert "value" in result
+        assert isinstance(result, str)
+
+    def test_sort_dict_multiple_keys_order_independent(self):
+        """Dict with multiple keys should produce same result regardless of input order."""
+        from guidelinely.client import _sort_data_structure
+
+        dict1 = {"z": 1, "a": 2, "m": 3}
+        dict2 = {"a": 2, "m": 3, "z": 1}
+        dict3 = {"m": 3, "z": 1, "a": 2}
+
+        result1 = _sort_data_structure(dict1)
+        result2 = _sort_data_structure(dict2)
+        result3 = _sort_data_structure(dict3)
+
+        assert result1 == result2 == result3
+        assert isinstance(result1, str)
+
+    def test_sort_dict_nested(self):
+        """Nested dict should be recursively sorted."""
+        from guidelinely.client import _sort_data_structure
+
+        data = {"outer": {"inner": "value"}}
+        result = _sort_data_structure(data)
+        assert "outer" in result
+        assert "inner" in result
+        assert "value" in result
+        assert isinstance(result, str)
+
+    def test_sort_list_empty(self):
+        """Empty list should return sorted representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure([])
+        assert result == "[]"
+        assert isinstance(result, str)
+
+    def test_sort_list_single_item(self):
+        """Single item list should return sorted representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(["item"])
+        assert "item" in result
+        assert isinstance(result, str)
+
+    def test_sort_list_multiple_items_sorted(self):
+        """List items should be sorted in result."""
+        from guidelinely.client import _sort_data_structure
+
+        list1 = ["z", "a", "m"]
+        list2 = ["a", "m", "z"]
+
+        result1 = _sort_data_structure(list1)
+        result2 = _sort_data_structure(list2)
+
+        # Lists should produce same result when sorted
+        assert result1 == result2
+        assert isinstance(result1, str)
+
+    def test_sort_list_mixed_types(self):
+        """List with mixed types should be sorted."""
+        from guidelinely.client import _sort_data_structure
+
+        data = [1, "string", 3.14]
+        result = _sort_data_structure(data)
+        assert isinstance(result, str)
+
+    def test_sort_list_nested(self):
+        """Nested list should be recursively sorted."""
+        from guidelinely.client import _sort_data_structure
+
+        data = [["inner", "list"], ["another", "list"]]
+        result = _sort_data_structure(data)
+        assert isinstance(result, str)
+
+    def test_sort_complex_nested_structure(self):
+        """Complex nested structure should be sorted consistently."""
+        from guidelinely.client import _sort_data_structure
+
+        data1 = {
+            "params": ["Aluminum", {"name": "Copper", "unit": "mg/L"}],
+            "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
+            "media": "surface_water",
+        }
+        data2 = {
+            "media": "surface_water",
+            "context": {"hardness": "100 mg/L", "pH": "7.0 1"},
+            "params": ["Aluminum", {"unit": "mg/L", "name": "Copper"}],
+        }
+
+        result1 = _sort_data_structure(data1)
+        result2 = _sort_data_structure(data2)
+
+        assert result1 == result2
+        assert isinstance(result1, str)
+
+    def test_sort_unsupported_type_raises_error(self):
+        """Unsupported types should raise TypeError."""
+        from guidelinely.client import _sort_data_structure
+
+        class CustomClass:
+            pass
+
+        with pytest.raises(TypeError, match="Unsupported data type for cache key"):
+            _sort_data_structure(CustomClass())
+
+    def test_sort_tuple_raises_error(self):
+        """Tuple should raise TypeError (not supported)."""
+        from guidelinely.client import _sort_data_structure
+
+        with pytest.raises(TypeError, match="Unsupported data type for cache key"):
+            _sort_data_structure((1, 2, 3))
+
+    def test_sort_set_raises_error(self):
+        """Set should raise TypeError (not supported)."""
+        from guidelinely.client import _sort_data_structure
+
+        with pytest.raises(TypeError, match="Unsupported data type for cache key"):
+            _sort_data_structure({1, 2, 3})
+
+
 class TestCacheOperations:
     """Test cache get/set operations using temporary cache."""
 
@@ -62,110 +288,69 @@ class TestCacheOperations:
 class TestCacheKeyNormalization:
     """Test cache key normalization for consistent cache hits."""
 
-    def test_normalize_context_single_dict_order_independent(self):
-        """Same context with different key order should produce same normalized key."""
-        from guidelinely.client import _normalize_context_for_cache
+    def test_get_cache_key_dict_order_independent(self):
+        """Same dict with different key order should produce same cache key."""
+        from guidelinely.client import _get_cache_key
 
-        context1 = {"pH": "7.0 1", "hardness": "100 mg/L", "temperature": "20 °C"}
-        context2 = {"temperature": "20 °C", "pH": "7.0 1", "hardness": "100 mg/L"}
-        context3 = {"hardness": "100 mg/L", "temperature": "20 °C", "pH": "7.0 1"}
+        data1 = {"pH": "7.0 1", "hardness": "100 mg/L", "temperature": "20 °C"}
+        data2 = {"temperature": "20 °C", "pH": "7.0 1", "hardness": "100 mg/L"}
+        data3 = {"hardness": "100 mg/L", "temperature": "20 °C", "pH": "7.0 1"}
 
-        normalized1 = _normalize_context_for_cache(context1)
-        normalized2 = _normalize_context_for_cache(context2)
-        normalized3 = _normalize_context_for_cache(context3)
+        key1 = _get_cache_key(data1)
+        key2 = _get_cache_key(data2)
+        key3 = _get_cache_key(data3)
 
-        assert normalized1 == normalized2 == normalized3
+        assert key1 == key2 == key3
 
-    def test_normalize_context_list_of_dicts_order_independent(self):
-        """List of contexts with different key orders should produce same normalized key."""
-        from guidelinely.client import _normalize_context_for_cache
+    def test_get_cache_key_list_order_matters_but_items_normalized(self):
+        """Lists maintain order but nested structures are normalized."""
+        from guidelinely.client import _get_cache_key
 
-        context1 = [
+        # Same items in same order with different dict key orders
+        data1 = [
             {"pH": "7.0 1", "hardness": "100 mg/L"},
             {"pH": "8.0 1", "hardness": "200 mg/L"},
         ]
-        context2 = [
+        data2 = [
             {"hardness": "100 mg/L", "pH": "7.0 1"},
             {"hardness": "200 mg/L", "pH": "8.0 1"},
         ]
 
-        normalized1 = _normalize_context_for_cache(context1)
-        normalized2 = _normalize_context_for_cache(context2)
+        key1 = _get_cache_key(data1)
+        key2 = _get_cache_key(data2)
 
-        assert normalized1 == normalized2
+        # Should be equal because dict items are sorted
+        assert key1 == key2
 
-    def test_normalize_context_none_returns_none(self):
-        """None context should return None."""
-        from guidelinely.client import _normalize_context_for_cache
+    def test_get_cache_key_handles_none(self):
+        """None should produce consistent cache key."""
+        from guidelinely.client import _get_cache_key
 
-        assert _normalize_context_for_cache(None) is None
+        key = _get_cache_key(None)
+        assert key == "None"
 
-    def test_normalize_context_produces_hashable_result(self):
-        """Normalized context should be hashable (tuples, not dicts)."""
-        from guidelinely.client import _normalize_context_for_cache
+    def test_get_cache_key_nested_structures(self):
+        """Complex nested structures should be normalized consistently."""
+        from guidelinely.client import _get_cache_key
 
-        context = {"pH": "7.0 1", "hardness": "100 mg/L"}
-        normalized = _normalize_context_for_cache(context)
+        data1 = {
+            "endpoint": "calculate",
+            "parameters": ["Aluminum", {"name": "Copper", "target_unit": "μg/L"}],
+            "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
+        }
+        data2 = {
+            "context": {"hardness": "100 mg/L", "pH": "7.0 1"},  # Different order
+            "parameters": [
+                "Aluminum",
+                {"target_unit": "μg/L", "name": "Copper"},
+            ],  # Different order
+            "endpoint": "calculate",
+        }
 
-        # Should be a tuple, not a dict
-        assert isinstance(normalized, tuple)
-        # Should be hashable (can be used in sets/dict keys)
-        hash(normalized)
+        key1 = _get_cache_key(data1)
+        key2 = _get_cache_key(data2)
 
-    def test_normalize_parameters_strings_order_independent(self):
-        """Parameter string lists with different orders should produce same normalized key."""
-        from guidelinely.client import _normalize_parameters_for_cache
-
-        params1 = ["Aluminum", "Copper", "Lead"]
-        params2 = ["Copper", "Lead", "Aluminum"]
-        params3 = ["Lead", "Aluminum", "Copper"]
-
-        normalized1 = _normalize_parameters_for_cache(params1)
-        normalized2 = _normalize_parameters_for_cache(params2)
-        normalized3 = _normalize_parameters_for_cache(params3)
-
-        # Parameters should be sorted alphabetically for consistent cache keys
-        assert normalized1 == normalized2 == normalized3
-        assert normalized1 == ("Aluminum", "Copper", "Lead")
-
-    def test_normalize_parameters_dicts_order_independent(self):
-        """Parameter dicts with different key orders should produce same normalized key."""
-        from guidelinely.client import _normalize_parameters_for_cache
-
-        params1 = [
-            "Aluminum",
-            {"name": "Copper", "target_unit": "μg/L"},
-            {"name": "Lead", "target_unit": "mg/L"},
-        ]
-        params2 = [
-            "Aluminum",
-            {"target_unit": "μg/L", "name": "Copper"},  # Different key order
-            {"target_unit": "mg/L", "name": "Lead"},  # Different key order
-        ]
-
-        normalized1 = _normalize_parameters_for_cache(params1)
-        normalized2 = _normalize_parameters_for_cache(params2)
-
-        assert normalized1 == normalized2
-
-    def test_normalize_parameters_mixed_types(self):
-        """Mixed parameter types should be normalized correctly."""
-        from guidelinely.client import _normalize_parameters_for_cache
-
-        params = [
-            "Aluminum",  # String
-            {"name": "Copper", "target_unit": "μg/L"},  # Dict
-            "Lead",  # String
-        ]
-
-        normalized = _normalize_parameters_for_cache(params)
-
-        expected = (
-            "Aluminum",
-            "Lead",
-            (("name", "Copper"), ("target_unit", "μg/L")),
-        )
-        assert normalized == expected
+        assert key1 == key2
 
     def test_cache_hit_with_reordered_context(self, httpx_mock):
         """Cache should hit when same context is provided with different key order."""
@@ -273,6 +458,75 @@ class TestCacheKeyNormalization:
         # Only one HTTP request should have been made (second was cache hit)
         requests = httpx_mock.get_requests()
         assert len(requests) == 1
+
+    def test_cache_key_string_consistency(self):
+        """Test that _get_cache_key produces consistent string results."""
+        from guidelinely.client import _get_cache_key
+
+        # Same cache key data with different dict order
+        cache_key1 = {
+            "endpoint": "calculate",
+            "parameter": "Aluminum",
+            "media": "surface_water",
+            "context": {"hardness": "100 mg/L", "pH": "7.0 1"},
+            "target_unit": None,
+            "include_formula_svg": False,
+        }
+
+        cache_key2 = {
+            "include_formula_svg": False,
+            "target_unit": None,
+            "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
+            "media": "surface_water",
+            "parameter": "Aluminum",
+            "endpoint": "calculate",
+        }
+
+        key1 = _get_cache_key(cache_key1)
+        key2 = _get_cache_key(cache_key2)
+
+        # Should produce identical cache keys
+        assert key1 == key2
+        assert isinstance(key1, str)
+        assert isinstance(key2, str)
+
+    def test_cache_works_with_string_keys(self, httpx_mock):
+        """Cache should work correctly with string keys from _get_cache_key."""
+        from guidelinely.cache import cache, get_cached, set_cached
+        from guidelinely.client import _get_cache_key
+
+        cache.clear()
+
+        # Create cache keys that would have different order
+        cache_key_dict1 = {
+            "endpoint": "calculate",
+            "parameter": "Aluminum",
+            "media": "surface_water",
+            "context": {"hardness": "100 mg/L", "pH": "7.0 1"},
+            "target_unit": None,
+            "include_formula_svg": False,
+        }
+
+        cache_key_dict2 = {
+            "include_formula_svg": False,
+            "target_unit": None,
+            "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
+            "media": "surface_water",
+            "parameter": "Aluminum",
+            "endpoint": "calculate",
+        }
+
+        # Get string keys
+        key1 = _get_cache_key(cache_key_dict1)
+        key2 = _get_cache_key(cache_key_dict2)
+
+        # Set cache with first key
+        test_data = {"results": [], "context": {}, "total_count": 0}
+        set_cached(key1, test_data)
+
+        # Should retrieve with second key (different dict order but same data)
+        cached_data = get_cached(key2)
+        assert cached_data == test_data
 
 
 class TestCacheConfiguration:
