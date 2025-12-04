@@ -21,24 +21,44 @@ __all__ = [
 ]
 
 
-class GuidelineResponse(BaseModel):
+class GuidelineSearchResult(BaseModel):
+    """Result from guideline search endpoint.
+
+    Contains guideline metadata without calculated values.
+    """
+
+    parameter: str
+    parameter_specification: Optional[str] = None
+    receptor: Optional[str] = None
+    media: Optional[str] = None
+    purpose: Optional[str] = None
+    exposure_duration: Optional[str] = None
+    table: Optional[str] = None
+    application: Optional[str] = None
+    basis: Optional[str] = None
+    modifier: Optional[str] = None
+    sector: Optional[str] = None
+    grouping: Optional[str] = None
+    use_case: Optional[str] = None
+    sample_fraction: Optional[str] = None
+    method_speciation: Optional[str] = None
+    season: Optional[str] = None
+    location: Optional[str] = None
+    narrative: Optional[str] = None
+    comment: Optional[str] = None
+    source_name: Optional[str] = None
+    source_abbreviation: Optional[str] = None
+    document_name: Optional[str] = None
+    document_abbreviation: Optional[str] = None
+    document_url: Optional[str] = None
+
+
+class GuidelineResponse(GuidelineSearchResult):
     """Single guideline result with calculated or static value.
 
     Represents a guideline value in PostgreSQL unitrange format (e.g., '[10 μg/L,100 μg/L]').
     """
 
-    id: int
-    parameter: str
-    method_speciation: Optional[str] = None
-    sample_fraction: Optional[str] = None
-    parameter_specification: str
-    receptor: str
-    exposure_duration: str
-    media: str
-    purpose: str
-    table: str
-    application: str
-    basis: str
     value: str  # PostgreSQL unitrange format: '[10 μg/L,100 μg/L]', '(,87.0 μg/L]', '[5.0 mg/L,)'
     lower: Optional[float] = None  # Parsed lower bound or None if unbounded
     upper: Optional[float] = None  # Parsed upper bound or None if unbounded
@@ -46,13 +66,7 @@ class GuidelineResponse(BaseModel):
     is_calculated: bool
     calculation_used: Optional[str] = None
     formula_svg: Optional[str] = None
-    narrative: Optional[str] = None  # Qualitative guidance text for narrative guidelines
     use_case: Optional[str] = None
-    source: str
-    source_abbreviation: Optional[str] = None
-    document: str
-    document_url: Optional[str] = None
-    document_abbreviation: Optional[str] = None
     error: Optional[str] = None  # Error message if resolution failed
     error_type: Optional[str] = None  # Error type: validation, lookup, or unexpected
     context_index: Optional[int] = None  # Index of context used when multiple contexts provided
@@ -152,35 +166,3 @@ class StatsResponse(BaseModel):
     guidelines: int
     sources: int
     documents: int
-
-
-class GuidelineSearchResult(BaseModel):
-    """Result from guideline search endpoint.
-
-    Contains guideline metadata without calculated values.
-    """
-
-    id: int
-    parameter: str
-    parameter_specification: Optional[str] = None
-    receptor: Optional[str] = None
-    media: Optional[str] = None
-    purpose: Optional[str] = None
-    exposure_duration: Optional[str] = None
-    table: Optional[str] = None
-    application: Optional[str] = None
-    basis: Optional[str] = None
-    modifier: Optional[str] = None
-    sector: Optional[str] = None
-    grouping: Optional[str] = None
-    use_case: Optional[str] = None
-    sample_fraction: Optional[str] = None
-    method_speciation: Optional[str] = None
-    season: Optional[str] = None
-    location: Optional[str] = None
-    narrative: Optional[str] = None
-    comment: Optional[str] = None
-    source_name: Optional[str] = None
-    source_abbreviation: Optional[str] = None
-    document_name: Optional[str] = None
-    document_abbreviation: Optional[str] = None

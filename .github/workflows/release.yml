@@ -64,7 +64,7 @@ jobs:
         pip install -e ".[dev]"
 
     - name: Check formatting with Black
-      run: black --check --exclude='_version\.py' guidelinely/ tests/
+      run: black --check guidelinely/ tests/
 
     - name: Lint with Ruff
       run: ruff check guidelinely/ tests/

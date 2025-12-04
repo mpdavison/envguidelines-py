@@ -33,9 +33,11 @@ from guidelinely.models import (
 )
 
 try:
-    from guidelinely._version import __version__
-except ImportError:
-    __version__ = "0.0.0"  # Fallback for editable installs without build
+    from importlib.metadata import version
+
+    __version__ = version("guidelinely")
+except Exception:
+    __version__ = "0.0.0"  # Not installed
 
 __all__ = [
     # Client functions

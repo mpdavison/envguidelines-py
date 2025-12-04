@@ -5,7 +5,6 @@ repos:
       - id: black
         args: [--check, --line-length=100]
         files: ^(guidelinely|tests)/
-        exclude: ^guidelinely/_version\.py$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.1
