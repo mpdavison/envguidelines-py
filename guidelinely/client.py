@@ -112,6 +112,21 @@ def _normalize_parameters_for_cache(
     return tuple(sorted(normalized, key=lambda x: (0 if isinstance(x, str) else 1, x)))
 
 
+def _normalize_cache_key(cache_key: dict[str, Any]) -> tuple[tuple[str, Any], ...]:
+    """Normalize cache key dict to sorted tuple for consistent serialization.
+
+    Converts cache_key dict to a sorted tuple of tuples so that diskcache
+    serialization is consistent regardless of the order keys were added to the dict.
+
+    Args:
+        cache_key: Dictionary representing the cache key.
+
+    Returns:
+        Sorted tuple of (key, value) pairs.
+    """
+    return tuple(sorted(cache_key.items()))
+
+
 def health_check() -> dict[str, Any]:
     """Check if the API service is running.
 
@@ -442,7 +457,7 @@ def calculate_guidelines(
 
     # Prepare cache key (excludes api_key for security - keys should not be stored on disk)
     # Context is normalized (sorted) to ensure consistent cache hits regardless of key order
-    cache_key = {
+    cache_key_dict = {
         "endpoint": "calculate",
         "parameter": parameter,
         "media": media,
@@ -450,12 +465,16 @@ def calculate_guidelines(
         "target_unit": target_unit,
         "include_formula_svg": include_formula_svg,
     }
+    # Normalize the entire cache key to ensure consistent serialization
+    cache_key = _normalize_cache_key(cache_key_dict)
 
     # Check cache first
     cached_response = get_cached(cache_key)
     if cached_response:
         logger.debug("Returning cached response")
         return CalculationResponse(**cached_response)
+    else:
+        logger.warning(f"No cached response found for key {cache_key}")
 
     body: dict[str, Any] = {
         "parameter": parameter,
@@ -571,13 +590,15 @@ def calculate_batch(
     # Prepare cache key (excludes api_key for security - keys should not be stored on disk)
     # Context and parameters are normalized (sorted) to ensure consistent cache hits
     # regardless of key order
-    cache_key = {
+    cache_key_dict = {
         "endpoint": "calculate/batch",
         "parameters": _normalize_parameters_for_cache(parameters),
         "media": media,
         "context": _normalize_context_for_cache(context),
         "include_formula_svg": include_formula_svg,
     }
+    # Normalize the entire cache key to ensure consistent serialization
+    cache_key = _normalize_cache_key(cache_key_dict)
 
     # Check cache first
     cached_response = get_cached(cache_key)

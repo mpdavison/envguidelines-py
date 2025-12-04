@@ -289,11 +289,19 @@ Parsed into `lower`, `upper`, and `unit` fields.
 # Install development dependencies
 pip install -e ".[dev]"
 
+# Install pre-commit hooks
+pre-commit install
+
+# Run all quality checks (formatting, linting, type checking, tests with coverage)
+pre-commit run --all-files
+
+# Or run individually:
+
 # Run tests
 pytest
 
-# Run tests with coverage
-pytest --cov=guidelinely --cov-report=html
+# Run tests with coverage (minimum 85% required)
+pytest --cov=guidelinely --cov-report=html --cov-fail-under=85
 
 # Format code
 black guidelinely/ tests/ examples/
