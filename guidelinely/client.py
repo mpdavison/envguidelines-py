@@ -35,7 +35,7 @@ DEFAULT_TIMEOUT = float(os.getenv("GUIDELINELY_TIMEOUT", "30.0"))
 
 # Package version for User-Agent header
 try:
-    from guidelinely._version import __version__
+    from guidelinely import __version__
 except ImportError:
     __version__ = "0.0.0"
 
