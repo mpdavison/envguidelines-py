@@ -92,24 +92,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install build setuptools-scm
 
-    - name: Debug version detection (before build)
+    - name: Get version from tag
+      id: get_version
       run: |
-        echo "Git describe: $(git describe --tags)"
-        echo "Git tag on HEAD: $(git tag --points-at HEAD)"
-        echo "setuptools_scm version: $(python -m setuptools_scm)"
-        echo "Git status:"
-        git status --short
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
 
     - name: Build package
+      env:
+        SETUPTOOLS_SCM_PRETEND_VERSION: ${{ steps.get_version.outputs.version }}
       run: python -m build
-
-    - name: Debug version detection (after build)
-      run: |
-        echo "setuptools_scm version after build: $(python -m setuptools_scm)"
-        echo "Git status after build:"
-        git status --short
-        echo "Files in dist:"
-        ls -la dist/
 
     - name: Check build artifacts
       run: ls -la dist/
