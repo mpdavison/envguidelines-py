@@ -14,6 +14,7 @@ from guidelinely.client import (
     list_parameters,
     list_sources,
     readiness_check,
+    search_guidelines,
     search_parameters,
 )
 from guidelinely.exceptions import (
@@ -25,6 +26,7 @@ from guidelinely.exceptions import (
 from guidelinely.models import (
     CalculationResponse,
     GuidelineResponse,
+    GuidelineSearchResult,
     SourceDocument,
     SourceResponse,
     StatsResponse,
@@ -41,6 +43,7 @@ __all__ = [
     "readiness_check",
     "list_parameters",
     "search_parameters",
+    "search_guidelines",
     "list_media",
     "list_sources",
     "get_stats",
@@ -49,6 +52,7 @@ __all__ = [
     # Models
     "GuidelineResponse",
     "CalculationResponse",
+    "GuidelineSearchResult",
     "SourceResponse",
     "SourceDocument",
     "StatsResponse",

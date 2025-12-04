@@ -19,6 +19,7 @@ from guidelinely.exceptions import (
 )
 from guidelinely.models import (
     CalculationResponse,
+    GuidelineSearchResult,
     SourceResponse,
     StatsResponse,
 )
@@ -618,4 +619,155 @@ def calculate_batch(
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
     except httpx.TransportError as e:
         logger.warning(f"Batch calculate connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def search_guidelines(
+    *,
+    parameter: Optional[str] = None,
+    parameter_specification: Optional[str] = None,
+    receptor: Optional[str] = None,
+    media: Optional[str] = None,
+    purpose: Optional[str] = None,
+    exposure_duration: Optional[str] = None,
+    table: Optional[str] = None,
+    application: Optional[str] = None,
+    basis: Optional[str] = None,
+    modifier: Optional[str] = None,
+    sector: Optional[str] = None,
+    grouping: Optional[str] = None,
+    use_case: Optional[str] = None,
+    sample_fraction: Optional[str] = None,
+    method_speciation: Optional[str] = None,
+    season: Optional[str] = None,
+    location: Optional[str] = None,
+    narrative: Optional[str] = None,
+    comment: Optional[str] = None,
+    source_name: Optional[str] = None,
+    source_abbreviation: Optional[str] = None,
+    document_name: Optional[str] = None,
+    document_abbreviation: Optional[str] = None,
+    limit: int = 100,
+) -> list[GuidelineSearchResult]:
+    """Search for guidelines using flexible field-based filtering.
+
+    Search for guidelines across multiple fields using case-insensitive substring matching.
+    All parameters are keyword-only to ensure clarity.
+
+    Args:
+        parameter: Filter by chemical parameter name (e.g., "aluminum").
+        parameter_specification: Filter by full parameter specification.
+        receptor: Filter by receptor type (e.g., "aquatic_life", "human_health").
+        media: Filter by environmental media (e.g., "surface_water", "groundwater", "soil").
+        purpose: Filter by guideline purpose (e.g., "protection", "remediation").
+        exposure_duration: Filter by exposure duration (e.g., "acute", "chronic").
+        table: Filter by table identifier from source document.
+        application: Filter by application context.
+        basis: Filter by basis or rationale.
+        modifier: Filter by modifier text.
+        sector: Filter by sector classification.
+        grouping: Filter by parameter grouping.
+        use_case: Filter by use case description.
+        sample_fraction: Filter by sample fraction.
+        method_speciation: Filter by method speciation.
+        season: Filter by seasonal applicability (e.g., "winter", "summer").
+        location: Filter by location applicability (e.g., "alberta").
+        narrative: Filter by narrative guidance text.
+        comment: Filter by additional comments.
+        source_name: Filter by source organization name.
+        source_abbreviation: Filter by source abbreviation (e.g., "AEPA", "CCME").
+        document_name: Filter by document title.
+        document_abbreviation: Filter by document abbreviation (e.g., "PAL", "MDMER").
+        limit: Maximum number of results to return (1-500, default 100).
+
+    Returns:
+        List of GuidelineSearchResult objects matching the search criteria.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Find all aluminum guidelines
+        results = search_guidelines(parameter="aluminum")
+
+        # Find surface water guidelines for aquatic life
+        results = search_guidelines(media="surface_water", receptor="aquatic_life")
+
+        # Find protection guidelines from AEPA
+        results = search_guidelines(source_abbreviation="AEPA", purpose="protection")
+
+        # Find guidelines applicable in winter
+        results = search_guidelines(season="winter")
+    """
+    logger.debug("Searching guidelines with filters")
+
+    # Build query parameters, excluding None values
+    params: dict[str, Any] = {}
+    if parameter is not None:
+        params["parameter"] = parameter
+    if parameter_specification is not None:
+        params["parameter_specification"] = parameter_specification
+    if receptor is not None:
+        params["receptor"] = receptor
+    if media is not None:
+        params["media"] = media
+    if purpose is not None:
+        params["purpose"] = purpose
+    if exposure_duration is not None:
+        params["exposure_duration"] = exposure_duration
+    if table is not None:
+        params["table"] = table
+    if application is not None:
+        params["application"] = application
+    if basis is not None:
+        params["basis"] = basis
+    if modifier is not None:
+        params["modifier"] = modifier
+    if sector is not None:
+        params["sector"] = sector
+    if grouping is not None:
+        params["grouping"] = grouping
+    if use_case is not None:
+        params["use_case"] = use_case
+    if sample_fraction is not None:
+        params["sample_fraction"] = sample_fraction
+    if method_speciation is not None:
+        params["method_speciation"] = method_speciation
+    if season is not None:
+        params["season"] = season
+    if location is not None:
+        params["location"] = location
+    if narrative is not None:
+        params["narrative"] = narrative
+    if comment is not None:
+        params["comment"] = comment
+    if source_name is not None:
+        params["source_name"] = source_name
+    if source_abbreviation is not None:
+        params["source_abbreviation"] = source_abbreviation
+    if document_name is not None:
+        params["document_name"] = document_name
+    if document_abbreviation is not None:
+        params["document_abbreviation"] = document_abbreviation
+    params["limit"] = limit
+
+    logger.debug(f"Search guidelines params: {params}")
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/guidelines/search",
+                params=params,
+            )
+            logger.debug(f"Search guidelines response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return [GuidelineSearchResult(**item) for item in response.json()]
+    except httpx.TimeoutException as e:
+        logger.warning(f"Search guidelines timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Search guidelines connection failed: {e}")
         raise GuidelinelyConnectionError(f"Connection failed: {e}") from e

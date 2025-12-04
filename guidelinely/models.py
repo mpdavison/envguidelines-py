@@ -12,6 +12,7 @@ __all__ = [
     "SourceDocument",
     "StatsResponse",
     "MediaResponse",
+    "GuidelineSearchResult",
     # Request models
     "CalculateRequest",
     "BatchCalculateRequest",
@@ -151,3 +152,35 @@ class StatsResponse(BaseModel):
     guidelines: int
     sources: int
     documents: int
+
+
+class GuidelineSearchResult(BaseModel):
+    """Result from guideline search endpoint.
+
+    Contains guideline metadata without calculated values.
+    """
+
+    id: int
+    parameter: str
+    parameter_specification: Optional[str] = None
+    receptor: Optional[str] = None
+    media: Optional[str] = None
+    purpose: Optional[str] = None
+    exposure_duration: Optional[str] = None
+    table: Optional[str] = None
+    application: Optional[str] = None
+    basis: Optional[str] = None
+    modifier: Optional[str] = None
+    sector: Optional[str] = None
+    grouping: Optional[str] = None
+    use_case: Optional[str] = None
+    sample_fraction: Optional[str] = None
+    method_speciation: Optional[str] = None
+    season: Optional[str] = None
+    location: Optional[str] = None
+    narrative: Optional[str] = None
+    comment: Optional[str] = None
+    source_name: Optional[str] = None
+    source_abbreviation: Optional[str] = None
+    document_name: Optional[str] = None
+    document_abbreviation: Optional[str] = None
