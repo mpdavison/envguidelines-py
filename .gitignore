@@ -51,3 +51,11 @@ r_reference/
 .DS_Store
 Thumbs.db
 *ipynb
+
+# docs
+docs/code*
+PROJECT_SUMMARY.md
+QUICKSTART.md
+PUBLISHING.md
+.gitignore
+guidelinely/README-IMPROVEMENTS.md

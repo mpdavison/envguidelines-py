@@ -76,7 +76,7 @@ class TestSearchGuidelines:
                     "id": 200,
                     "parameter": "Lead",
                     "source_abbreviation": "CCME",
-                    "source_name": "Canadian Council of Ministers",
+                    "source": "Canadian Council of Ministers",
                 }
             ],
             status_code=200,
@@ -207,7 +207,7 @@ class TestSearchGuidelines:
                     "id": 600,
                     "parameter": "Mercury",
                     "document_abbreviation": "PAL",
-                    "document_name": "Provincial Ambient Guidelines",
+                    "document": "Provincial Ambient Guidelines",
                 }
             ],
             status_code=200,

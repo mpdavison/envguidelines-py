@@ -208,6 +208,37 @@ class TestSortDataStructure:
         assert result1 == result2
         assert isinstance(result1, str)
 
+    def test_sort_tuple_empty(self):
+        """Empty tuple should return string representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure(())
+        assert result == "()"
+        assert isinstance(result, str)
+
+    def test_sort_tuple_single_item(self):
+        """Single item tuple should return string representation."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure((42,))
+        assert "42" in result
+        assert isinstance(result, str)
+
+    def test_sort_tuple_multiple_items(self):
+        """Multiple item tuple should be recursively sorted."""
+        from guidelinely.client import _sort_data_structure
+
+        result = _sort_data_structure((1, "test", 3.14))
+        assert isinstance(result, str)
+
+    def test_sort_tuple_nested(self):
+        """Nested tuple should be recursively sorted."""
+        from guidelinely.client import _sort_data_structure
+
+        data = ((1, 2), (3, 4))
+        result = _sort_data_structure(data)
+        assert isinstance(result, str)
+
     def test_sort_unsupported_type_raises_error(self):
         """Unsupported types should raise TypeError."""
         from guidelinely.client import _sort_data_structure
@@ -218,12 +249,12 @@ class TestSortDataStructure:
         with pytest.raises(TypeError, match="Unsupported data type for cache key"):
             _sort_data_structure(CustomClass())
 
-    def test_sort_tuple_raises_error(self):
-        """Tuple should raise TypeError (not supported)."""
+    def test_sort_bytes_raises_error(self):
+        """Bytes should raise TypeError (not supported)."""
         from guidelinely.client import _sort_data_structure
 
         with pytest.raises(TypeError, match="Unsupported data type for cache key"):
-            _sort_data_structure((1, 2, 3))
+            _sort_data_structure(b"bytes")
 
     def test_sort_set_raises_error(self):
         """Set should raise TypeError (not supported)."""

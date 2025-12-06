@@ -78,6 +78,8 @@ def _sort_data_structure(obj: Any) -> str:
         return str(obj)
     elif isinstance(obj, str):
         return str(obj)
+    elif isinstance(obj, tuple):
+        return str(tuple(_sort_data_structure(item) for item in obj))
     elif obj is None:
         return "None"
     else:
@@ -632,9 +634,9 @@ def search_guidelines(
     location: Optional[str] = None,
     narrative: Optional[str] = None,
     comment: Optional[str] = None,
-    source_name: Optional[str] = None,
+    source: Optional[str] = None,
     source_abbreviation: Optional[str] = None,
-    document_name: Optional[str] = None,
+    document: Optional[str] = None,
     document_abbreviation: Optional[str] = None,
     limit: int = 100,
 ) -> list[GuidelineSearchResult]:
@@ -663,9 +665,9 @@ def search_guidelines(
         location: Filter by location applicability (e.g., "alberta").
         narrative: Filter by narrative guidance text.
         comment: Filter by additional comments.
-        source_name: Filter by source organization name.
+        source: Filter by source organization name.
         source_abbreviation: Filter by source abbreviation (e.g., "AEPA", "CCME").
-        document_name: Filter by document title.
+        document: Filter by document title.
         document_abbreviation: Filter by document abbreviation (e.g., "PAL", "MDMER").
         limit: Maximum number of results to return (1-500, default 100).
 
@@ -732,12 +734,12 @@ def search_guidelines(
         params["narrative"] = narrative
     if comment is not None:
         params["comment"] = comment
-    if source_name is not None:
-        params["source_name"] = source_name
+    if source is not None:
+        params["source"] = source
     if source_abbreviation is not None:
         params["source_abbreviation"] = source_abbreviation
-    if document_name is not None:
-        params["document_name"] = document_name
+    if document is not None:
+        params["document"] = document
     if document_abbreviation is not None:
         params["document_abbreviation"] = document_abbreviation
     params["limit"] = limit
