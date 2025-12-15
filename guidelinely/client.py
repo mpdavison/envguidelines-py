@@ -444,7 +444,7 @@ def calculate_guidelines(
         logger.debug("Returning cached response")
         return CalculationResponse(**cached_response)
     else:
-        logger.warning(f"No cached response found for key {cache_key}")
+        logger.debug(f"No cached response found for key {cache_key}")
 
     body: dict[str, Any] = {
         "parameter": parameter,
