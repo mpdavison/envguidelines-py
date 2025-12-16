@@ -25,6 +25,10 @@ __all__ = [
     "BatchCalculateRequest",
     "ParameterWithUnit",
     "SearchParametersRequest",
+    # Parameter matching models
+    "ParameterMatch",
+    "ParameterMatchQueryResult",
+    "ParameterMatchResponse",
 ]
 
 
@@ -234,3 +238,29 @@ class AnalyticsSummary(BaseModel):
     top_endpoints: list[EndpointStatistics]
     top_keys: list[APIKeyUsage]
     top_user_agents: list[UserAgentStatistics]
+
+
+class ParameterMatch(BaseModel):
+    """Single parameter match result."""
+
+    parameter_specification: str
+    parameter: str
+    confidence: float  # 0.0-1.0 confidence score
+    media_types: list[str]  # Available media types for this parameter
+    match_type: str  # Type of match (e.g., 'abbreviation', 'exact', 'fuzzy')
+    strategy_used: str  # Strategy that produced this match ('simple', 'alias', 'llm', 'auto')
+
+
+class ParameterMatchQueryResult(BaseModel):
+    """Match results for a single query parameter."""
+
+    query: str  # Original query parameter
+    matches: list[ParameterMatch]  # List of matches for this query
+
+
+class ParameterMatchResponse(BaseModel):
+    """Response from /parameters/match endpoint."""
+
+    results: list[ParameterMatchQueryResult]  # Results for each query parameter
+    total_queries: int  # Total number of parameters queried
+    timestamp: str  # Timestamp of the match operation

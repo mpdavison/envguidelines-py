@@ -12,12 +12,15 @@ This Python client mirrors the functionality of the [R client](https://github.co
 ## Features
 
 - **Metadata Queries**: List parameters, search, explore media types and sources
+- **Parameter Matching**: Intelligent fuzzy matching for chemical abbreviations and spelling variants
 - **Single Calculations**: Calculate guidelines for individual parameters
 - **Batch Calculations**: Efficiently calculate multiple parameters (up to 50)
 - **Context-Aware**: Support for pH, hardness, temperature, and other environmental factors
 - **Unit Conversion**: Optional target unit specification
+- **Analytics**: Monitor API usage and performance (requires authentication)
 - **Type Safety**: Full Pydantic model support for request/response validation
 - **Comprehensive Tests**: Mock-based test suite with pytest-httpx
+- **Persistent Caching**: Automatic caching of calculation results with configurable TTL
 
 ## Installation
 
@@ -99,6 +102,7 @@ from guidelinely import (
     health_check,
     list_parameters,
     search_parameters,
+    match_parameters,
     list_media,
     list_sources,
     get_stats,
@@ -114,6 +118,14 @@ print(f"Available parameters: {len(params)}")
 # Search for ammonia-related parameters
 ammonia = search_parameters("ammon")
 print(ammonia)  # ['Ammonia', 'Ammonium', ...]
+
+# Match parameter names with intelligent fuzzy matching
+result = match_parameters(["NH3", "Cu", "Al"])
+for query_result in result.results:
+    print(f"{query_result.query} -> {query_result.matches[0].parameter}")
+# NH3 -> Ammonia
+# Cu -> Copper
+# Al -> Aluminum
 
 # Get available media types
 media = list_media()
@@ -367,6 +379,7 @@ ruff check guidelinely/ tests/
 - `readiness_check()` - Database readiness check
 - `list_parameters()` - List all chemical parameters
 - `search_parameters(q, media, source, document)` - Search parameters with filters
+- `match_parameters(parameters, threshold, include_media, strategy)` - Match parameter names using multi-strategy approach
 - `search_guidelines(**filters)` - Search guidelines by any field
 - `list_media()` - List media types
 - `list_sources()` - List guideline sources
@@ -392,6 +405,9 @@ ruff check guidelinely/ tests/
 - `CalculationResponse` - Calculation endpoint response
 - `SourceResponse` - Guideline source information
 - `StatsResponse` - Database statistics
+- `ParameterMatch` - Single parameter match result
+- `ParameterMatchQueryResult` - Matches for a query parameter
+- `ParameterMatchResponse` - Parameter matching response
 - `AnalyticsSummary` - Comprehensive analytics overview
 - `UsageStatistics` - Overall usage statistics
 - `EndpointStatistics` - Per-endpoint statistics
@@ -405,6 +421,48 @@ ruff check guidelinely/ tests/
 - `ParameterWithUnit` - Parameter with optional target unit
 - `SearchParametersRequest` - Parameter search filters
 
+## Parameter Name Matching
+
+The `match_parameters()` function helps handle naming inconsistencies across domains, geographies, and languages:
+
+```python
+from guidelinely import match_parameters
+
+# Match chemical abbreviations
+result = match_parameters(["NH3", "Cu", "Al", "Pb"])
+for query_result in result.results:
+    if query_result.matches:
+        match = query_result.matches[0]
+        print(f"{query_result.query} → {match.parameter} (confidence: {match.confidence:.0%})")
+
+# Handle spelling variations with alias strategy
+result = match_parameters(
+    ["Aluminium", "sulphate"],
+    strategy="alias",
+    threshold=0.3
+)
+
+# Fast matching without media types
+result = match_parameters(
+    ["copper", "lead", "zinc"],
+    include_media=False
+)
+```
+
+### Matching Strategies
+
+- **simple** (default): Fuzzy matching with hardcoded abbreviations (NH3 → Ammonia)
+- **alias**: Uses curated database table for translations and variants
+- **llm**: Semantic matching using Large Language Models (future)
+- **auto**: Tries strategies in sequence for best results
+
+### Parameters
+
+- `parameters`: List of parameter names to match (1-50 parameters)
+- `threshold`: Confidence threshold 0.0-1.0 (default 0.5, lower = more matches)
+- `include_media`: Include available media types (default True)
+- `strategy`: Matching strategy (default "auto")
+
 ## Examples
 
 See the `examples/` directory for complete working examples:
@@ -414,6 +472,8 @@ See the `examples/` directory for complete working examples:
 3. `03_batch_calculations.py` - Batch calculations
 4. `04_groundwater_calculations.py` - Groundwater calculations (soil guidelines coming soon)
 5. `05_advanced_workflow.py` - Advanced filtering and analysis
+6. `06_analytics.py` - API usage analytics
+7. `07_parameter_matching.py` - Parameter name matching and validation
 
 ## Resources
 

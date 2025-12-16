@@ -23,6 +23,7 @@ from guidelinely.models import (
     CalculationResponse,
     EndpointStatistics,
     GuidelineSearchResult,
+    ParameterMatchResponse,
     SourceResponse,
     StatsResponse,
     TimeSeriesData,
@@ -265,6 +266,92 @@ def search_parameters(
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
     except httpx.TransportError as e:
         logger.warning(f"Search parameters connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def match_parameters(
+    parameters: list[str],
+    threshold: float = 0.5,
+    include_media: bool = True,
+    strategy: str = "auto",
+) -> ParameterMatchResponse:
+    """Match parameter names to database values using multi-strategy approach.
+
+    Match parameter names to standardized database values, handling naming
+    inconsistencies across domains, geographies, and languages.
+
+    Args:
+        parameters: List of parameter names to match (1-50 parameters).
+        threshold: Confidence threshold (0.0-1.0). Lower values return more matches.
+            Default is 0.5.
+        include_media: Whether to include available media types for each match.
+            Default is True.
+        strategy: Matching strategy - "simple" (fuzzy + abbreviations),
+            "alias" (database table), "llm" (semantic - future), or "auto" (tries multiple).
+            Default is "auto".
+
+    Returns:
+        ParameterMatchResponse with matches for each query parameter, including
+        confidence scores, media types, match types, and strategies used.
+
+    Raises:
+        ValueError: If parameters list is empty or has more than 50 items.
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Match chemical abbreviations
+        result = match_parameters(["NH3", "Cu", "Al"])
+        for query_result in result.results:
+            print(f"Query: {query_result.query}")
+            for match in query_result.matches:
+                print(f"  - {match.parameter}: {match.confidence:.2f}")
+
+        # Match with alias strategy and lower threshold
+        result = match_parameters(
+            ["Aluminium", "ammon"],
+            threshold=0.3,
+            strategy="alias"
+        )
+
+        # Match without media types (faster)
+        result = match_parameters(
+            ["copper", "lead", "zinc"],
+            include_media=False
+        )
+    """
+    if not parameters:
+        raise ValueError("Parameters list cannot be empty")
+    if len(parameters) > 50:
+        raise ValueError("Maximum 50 parameters per request")
+
+    logger.debug(
+        f"Matching {len(parameters)} parameters with threshold={threshold}, " f"strategy={strategy}"
+    )
+
+    body: dict[str, Any] = {
+        "parameters": parameters,
+        "threshold": threshold,
+        "include_media": include_media,
+        "strategy": strategy,
+    }
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
+            response = client.post(
+                f"{GUIDELINELY_API_BASE}/parameters/match",
+                json=body,
+            )
+            logger.debug(f"Match parameters response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return ParameterMatchResponse(**response.json())
+    except httpx.TimeoutException as e:
+        logger.warning(f"Match parameters timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Match parameters connection failed: {e}")
         raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
