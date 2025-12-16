@@ -40,8 +40,10 @@ DEFAULT_TIMEOUT = float(os.getenv("GUIDELINELY_TIMEOUT", "30.0"))
 
 # Package version for User-Agent header
 try:
-    from guidelinely import __version__
-except ImportError:
+    from importlib.metadata import version
+
+    __version__ = version("guidelinely")
+except Exception:
     __version__ = "0.0.0"
 
 # User-Agent header for API request identification

@@ -217,6 +217,51 @@ context = {
 }
 ```
 
+## Analytics (Requires API Key)
+
+The library provides access to API analytics endpoints for monitoring usage and performance:
+
+```python
+from guidelinely import (
+    get_analytics_summary,
+    get_endpoint_statistics,
+    get_user_agent_statistics,
+    get_key_statistics,
+    get_timeseries_data,
+    get_error_statistics,
+)
+
+# Get comprehensive analytics summary for the last 30 days
+summary = get_analytics_summary(days=30, api_key="your_api_key")
+print(f"Total requests: {summary.overall_stats.total_requests}")
+print(f"Error rate: {summary.overall_stats.error_rate}%")
+
+# Get endpoint usage statistics
+endpoints = get_endpoint_statistics(days=30, api_key="your_api_key")
+for ep in endpoints[:5]:  # Top 5 endpoints
+    print(f"{ep.endpoint}: {ep.total_requests} requests")
+
+# Get time-series data for graphing
+data = get_timeseries_data(days=7, interval="daily", api_key="your_api_key")
+for point in data:
+    print(f"{point.timestamp}: {point.request_count} requests")
+
+# Get error statistics
+errors = get_error_statistics(days=30, api_key="your_api_key")
+print(f"Errors by status code: {errors}")
+```
+
+### Analytics Functions
+
+- `get_analytics_summary(days, api_key)` - Comprehensive analytics overview
+- `get_endpoint_statistics(days, api_key)` - Usage by endpoint
+- `get_user_agent_statistics(days, api_key)` - Usage by User-Agent
+- `get_key_statistics(days, api_key)` - Usage by API key
+- `get_timeseries_data(days, interval, api_key)` - Time-series data (hourly/daily)
+- `get_error_statistics(days, api_key)` - Error statistics by status code
+
+All analytics endpoints require a valid API key and return data for the specified time period (1-365 days).
+
 ## Error Handling
 
 The library provides custom exceptions for structured error handling:
@@ -317,22 +362,48 @@ ruff check guidelinely/ tests/
 
 ### Client Functions
 
+#### Metadata (No Authentication Required)
 - `health_check()` - Service health check
 - `readiness_check()` - Database readiness check
 - `list_parameters()` - List all chemical parameters
-- `search_parameters(q, media)` - Search parameters
+- `search_parameters(q, media, source, document)` - Search parameters with filters
+- `search_guidelines(**filters)` - Search guidelines by any field
 - `list_media()` - List media types
 - `list_sources()` - List guideline sources
 - `get_stats()` - Database statistics
+
+#### Calculations (Optional Authentication)
 - `calculate_guidelines(parameter, media, context, target_unit, api_key)` - Calculate single parameter
 - `calculate_batch(parameters, media, context, api_key)` - Batch calculate (max 50 parameters)
 
+#### Analytics (Requires Authentication)
+- `get_analytics_summary(days, api_key)` - Comprehensive analytics overview
+- `get_endpoint_statistics(days, api_key)` - Usage statistics by endpoint
+- `get_user_agent_statistics(days, api_key)` - Usage statistics by User-Agent
+- `get_key_statistics(days, api_key)` - Usage statistics by API key
+- `get_timeseries_data(days, interval, api_key)` - Time-series data (hourly/daily)
+- `get_error_statistics(days, api_key)` - Error statistics by status code
+
 ### Models
 
+#### Response Models
 - `GuidelineResponse` - Single guideline result
+- `GuidelineSearchResult` - Search result metadata
 - `CalculationResponse` - Calculation endpoint response
+- `SourceResponse` - Guideline source information
+- `StatsResponse` - Database statistics
+- `AnalyticsSummary` - Comprehensive analytics overview
+- `UsageStatistics` - Overall usage statistics
+- `EndpointStatistics` - Per-endpoint statistics
+- `APIKeyUsage` - Per-key usage statistics
+- `UserAgentStatistics` - Per-user-agent statistics
+- `TimeSeriesData` - Time-series data point
+
+#### Request Models
 - `CalculateRequest` - Single calculation request body
 - `BatchCalculateRequest` - Batch calculation request body
+- `ParameterWithUnit` - Parameter with optional target unit
+- `SearchParametersRequest` - Parameter search filters
 
 ## Examples
 
