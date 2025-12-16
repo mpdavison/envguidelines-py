@@ -13,6 +13,13 @@ __all__ = [
     "StatsResponse",
     "MediaResponse",
     "GuidelineSearchResult",
+    # Analytics models
+    "UsageStatistics",
+    "EndpointStatistics",
+    "APIKeyUsage",
+    "UserAgentStatistics",
+    "TimeSeriesData",
+    "AnalyticsSummary",
     # Request models
     "CalculateRequest",
     "BatchCalculateRequest",
@@ -166,3 +173,64 @@ class StatsResponse(BaseModel):
     guidelines: int
     sources: int
     documents: int
+
+
+class UsageStatistics(BaseModel):
+    """Overall API usage statistics."""
+
+    total_requests: int
+    unique_keys: int
+    avg_response_time_ms: float
+    error_rate: float
+    requests_by_status: dict[str, Any]
+
+
+class EndpointStatistics(BaseModel):
+    """Statistics for a specific endpoint."""
+
+    endpoint: str
+    total_requests: int
+    avg_response_time_ms: float
+    error_count: int
+    success_rate: float
+
+
+class APIKeyUsage(BaseModel):
+    """Usage statistics for an API key."""
+
+    api_key_id: int
+    api_key_name: str
+    total_requests: int
+    last_request: Optional[str] = None
+    avg_response_time_ms: float
+    error_count: int
+
+
+class UserAgentStatistics(BaseModel):
+    """Statistics for a specific User-Agent."""
+
+    user_agent: str
+    total_requests: int
+    avg_response_time_ms: float
+    error_count: int
+    success_rate: float
+
+
+class TimeSeriesData(BaseModel):
+    """Time-series data point."""
+
+    timestamp: str
+    request_count: int
+    avg_response_time_ms: float
+    error_count: int
+
+
+class AnalyticsSummary(BaseModel):
+    """Comprehensive analytics summary."""
+
+    period_start: str
+    period_end: str
+    overall_stats: UsageStatistics
+    top_endpoints: list[EndpointStatistics]
+    top_keys: list[APIKeyUsage]
+    top_user_agents: list[UserAgentStatistics]

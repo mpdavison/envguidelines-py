@@ -8,7 +8,13 @@ from guidelinely.auth import get_api_key
 from guidelinely.client import (
     calculate_batch,
     calculate_guidelines,
+    get_analytics_summary,
+    get_endpoint_statistics,
+    get_error_statistics,
+    get_key_statistics,
     get_stats,
+    get_timeseries_data,
+    get_user_agent_statistics,
     health_check,
     list_media,
     list_parameters,
@@ -24,12 +30,18 @@ from guidelinely.exceptions import (
     GuidelinelyTimeoutError,
 )
 from guidelinely.models import (
+    AnalyticsSummary,
+    APIKeyUsage,
     CalculationResponse,
+    EndpointStatistics,
     GuidelineResponse,
     GuidelineSearchResult,
     SourceDocument,
     SourceResponse,
     StatsResponse,
+    TimeSeriesData,
+    UsageStatistics,
+    UserAgentStatistics,
 )
 
 try:
@@ -51,6 +63,13 @@ __all__ = [
     "get_stats",
     "calculate_guidelines",
     "calculate_batch",
+    # Analytics functions
+    "get_analytics_summary",
+    "get_endpoint_statistics",
+    "get_user_agent_statistics",
+    "get_key_statistics",
+    "get_timeseries_data",
+    "get_error_statistics",
     # Models
     "GuidelineResponse",
     "CalculationResponse",
@@ -58,6 +77,13 @@ __all__ = [
     "SourceResponse",
     "SourceDocument",
     "StatsResponse",
+    # Analytics models
+    "AnalyticsSummary",
+    "UsageStatistics",
+    "EndpointStatistics",
+    "APIKeyUsage",
+    "UserAgentStatistics",
+    "TimeSeriesData",
     # Exceptions
     "GuidelinelyError",
     "GuidelinelyAPIError",

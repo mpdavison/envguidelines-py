@@ -18,10 +18,15 @@ from guidelinely.exceptions import (
     GuidelinelyTimeoutError,
 )
 from guidelinely.models import (
+    AnalyticsSummary,
+    APIKeyUsage,
     CalculationResponse,
+    EndpointStatistics,
     GuidelineSearchResult,
     SourceResponse,
     StatsResponse,
+    TimeSeriesData,
+    UserAgentStatistics,
 )
 
 # Module logger for debugging API calls
@@ -761,4 +766,331 @@ def search_guidelines(
         raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
     except httpx.TransportError as e:
         logger.warning(f"Search guidelines connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def get_analytics_summary(
+    days: int = 30,
+    api_key: Optional[str] = None,
+) -> AnalyticsSummary:
+    """Get comprehensive analytics summary for a specified time period.
+
+    Retrieve a complete analytics overview including overall usage statistics,
+    top endpoints, top API keys, and top user agents.
+
+    Requires API key authentication.
+
+    Args:
+        days: Number of days to analyze (1-365, default 30).
+        api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
+
+    Returns:
+        AnalyticsSummary with comprehensive usage data.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get analytics for the last 30 days
+        summary = get_analytics_summary()
+
+        # Get analytics for the last 7 days
+        summary = get_analytics_summary(days=7)
+    """
+    logger.debug(f"Getting analytics summary for {days} days")
+
+    key = get_api_key(api_key)
+    headers = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/analytics/summary",
+                params={"days": days},
+            )
+            logger.debug(f"Analytics summary response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return AnalyticsSummary(**response.json())
+    except httpx.TimeoutException as e:
+        logger.warning(f"Analytics summary timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Analytics summary connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def get_endpoint_statistics(
+    days: int = 30,
+    api_key: Optional[str] = None,
+) -> list[EndpointStatistics]:
+    """Get usage statistics for all endpoints.
+
+    Retrieve usage statistics for all API endpoints in the specified time period,
+    sorted by total request count (descending).
+
+    Requires API key authentication.
+
+    Args:
+        days: Number of days to analyze (1-365, default 30).
+        api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
+
+    Returns:
+        List of EndpointStatistics objects sorted by request count.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get endpoint statistics
+        endpoints = get_endpoint_statistics()
+        for ep in endpoints:
+            print(f"{ep.endpoint}: {ep.total_requests} requests")
+    """
+    logger.debug(f"Getting endpoint statistics for {days} days")
+
+    key = get_api_key(api_key)
+    headers = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/analytics/endpoints",
+                params={"days": days},
+            )
+            logger.debug(f"Endpoint statistics response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return [EndpointStatistics(**item) for item in response.json()]
+    except httpx.TimeoutException as e:
+        logger.warning(f"Endpoint statistics timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Endpoint statistics connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def get_user_agent_statistics(
+    days: int = 30,
+    api_key: Optional[str] = None,
+) -> list[UserAgentStatistics]:
+    """Get usage statistics grouped by User-Agent.
+
+    Retrieve usage statistics for different User-Agent strings in the specified
+    time period, sorted by total request count (descending).
+
+    Requires API key authentication.
+
+    Args:
+        days: Number of days to analyze (1-365, default 30).
+        api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
+
+    Returns:
+        List of UserAgentStatistics objects sorted by request count.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get user agent statistics
+        agents = get_user_agent_statistics()
+        for agent in agents:
+            print(f"{agent.user_agent}: {agent.total_requests} requests")
+    """
+    logger.debug(f"Getting user agent statistics for {days} days")
+
+    key = get_api_key(api_key)
+    headers = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/analytics/user-agents",
+                params={"days": days},
+            )
+            logger.debug(f"User agent statistics response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return [UserAgentStatistics(**item) for item in response.json()]
+    except httpx.TimeoutException as e:
+        logger.warning(f"User agent statistics timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"User agent statistics connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def get_key_statistics(
+    days: int = 30,
+    api_key: Optional[str] = None,
+) -> list[APIKeyUsage]:
+    """Get usage statistics for all API keys.
+
+    Retrieve usage statistics for all API keys in the specified time period,
+    sorted by total request count (descending).
+
+    Requires API key authentication.
+
+    Args:
+        days: Number of days to analyze (1-365, default 30).
+        api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
+
+    Returns:
+        List of APIKeyUsage objects sorted by request count.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get API key statistics
+        keys = get_key_statistics()
+        for key in keys:
+            print(f"{key.api_key_name}: {key.total_requests} requests")
+    """
+    logger.debug(f"Getting API key statistics for {days} days")
+
+    key = get_api_key(api_key)
+    headers = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/analytics/keys",
+                params={"days": days},
+            )
+            logger.debug(f"API key statistics response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return [APIKeyUsage(**item) for item in response.json()]
+    except httpx.TimeoutException as e:
+        logger.warning(f"API key statistics timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"API key statistics connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def get_timeseries_data(
+    days: int = 7,
+    interval: str = "daily",
+    api_key: Optional[str] = None,
+) -> list[TimeSeriesData]:
+    """Get time-series usage data grouped by time intervals.
+
+    Retrieve usage data over time, useful for creating usage graphs and
+    identifying trends.
+
+    Requires API key authentication.
+
+    Args:
+        days: Number of days to analyze (1-90, default 7).
+        interval: Time interval - "hourly" or "daily" (default "daily").
+        api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
+
+    Returns:
+        List of TimeSeriesData objects for each time interval.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get daily usage for the last 7 days
+        data = get_timeseries_data()
+
+        # Get hourly usage for the last 3 days
+        data = get_timeseries_data(days=3, interval="hourly")
+    """
+    logger.debug(f"Getting timeseries data for {days} days with {interval} interval")
+
+    key = get_api_key(api_key)
+    headers = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/analytics/timeseries",
+                params={"days": days, "interval": interval},
+            )
+            logger.debug(f"Timeseries data response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return [TimeSeriesData(**item) for item in response.json()]
+    except httpx.TimeoutException as e:
+        logger.warning(f"Timeseries data timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Timeseries data connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
+def get_error_statistics(
+    days: int = 30,
+    api_key: Optional[str] = None,
+) -> dict[str, Any]:
+    """Get error statistics for API requests.
+
+    Retrieve statistics about API errors (4xx and 5xx responses),
+    grouped by status code with counts and percentages.
+
+    Requires API key authentication.
+
+    Args:
+        days: Number of days to analyze (1-365, default 30).
+        api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
+
+    Returns:
+        Dictionary with error statistics grouped by status code.
+
+    Raises:
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get error statistics
+        errors = get_error_statistics()
+        print(f"404 errors: {errors.get('404', 0)}")
+    """
+    logger.debug(f"Getting error statistics for {days} days")
+
+    key = get_api_key(api_key)
+    headers = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.get(
+                f"{GUIDELINELY_API_BASE}/analytics/errors",
+                params={"days": days},
+            )
+            logger.debug(f"Error statistics response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return cast(dict[str, Any], response.json())
+    except httpx.TimeoutException as e:
+        logger.warning(f"Error statistics timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Error statistics connection failed: {e}")
         raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
