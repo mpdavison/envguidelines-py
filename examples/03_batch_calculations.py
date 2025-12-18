@@ -57,7 +57,7 @@ def main():
         print(f"\n{param}:")
         print("-" * 60)
         for g in guidelines:
-            print(f"  {g.value} | {g.receptor} | {g.exposure_duration} | {g.source}")
+            print(f"  {g.value} | {g.receptor} | {g.exposure_duration} | {g.table_name} | {g.source}")
 
     # Example with per-parameter unit conversion
     print("\n\n=== With Per-Parameter Unit Conversion ===")

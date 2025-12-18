@@ -211,6 +211,7 @@ def test_calculate_guidelines(httpx_mock):
                     "exposure_duration": "chronic",
                     "purpose": "long_term",
                     "table": "Table 1",
+                    "table_name": "Chronic Aquatic Life Guidelines",
                     "application": "Freshwater guidelines",
                     "basis": "Chronic toxicity",
                     "use_case": "Protection",
@@ -233,6 +234,7 @@ def test_calculate_guidelines(httpx_mock):
     assert result.total_count == 1
     assert len(result.results) == 1
     assert result.results[0].parameter_specification == "Aluminum, Dissolved"
+    assert result.results[0].table_name == "Chronic Aquatic Life Guidelines"
     assert result.results[0].is_calculated is True
     assert result.context["pH"] == "7.0 1"
     # Verify use_case is present and correctly parsed
@@ -280,6 +282,7 @@ def test_calculate_batch(httpx_mock):
                     "exposure_duration": "chronic",
                     "purpose": "long_term",
                     "table": "Table 1",
+                    "table_name": "Chronic Aquatic Life Guidelines",
                     "application": "Freshwater guidelines",
                     "basis": "Chronic toxicity",
                     "use_case": "Protection",
@@ -300,6 +303,7 @@ def test_calculate_batch(httpx_mock):
                     "exposure_duration": "chronic",
                     "purpose": "long_term",
                     "table": "Table 1",
+                    "table_name": "Chronic Aquatic Life Guidelines",
                     "application": "Freshwater guidelines",
                     "basis": "Chronic toxicity",
                     "use_case": "Protection",
@@ -316,11 +320,13 @@ def test_calculate_batch(httpx_mock):
         parameters=["Aluminum", "Copper"],
         media="surface_water",
         context={"pH": "7.0 1", "hardness": "100 mg/L"},
-        api_key="dummy",
     )
 
     assert result.total_count == 2
     assert len(result.results) == 2
+    assert result.results[0].table_name == "Chronic Aquatic Life Guidelines"
+    assert result.results[1].table_name == "Chronic Aquatic Life Guidelines"
+    assert result.results[0].parameter == "Aluminum"
     # Verify use_case is present in batch results
     assert result.results[0].use_case == "Protection"
     assert result.results[1].use_case == "Protection"

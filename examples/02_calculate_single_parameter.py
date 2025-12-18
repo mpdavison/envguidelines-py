@@ -46,6 +46,7 @@ def main():
             print(f"Unit: {guideline.unit}")
             print(f"Receptor: {guideline.receptor}")
             print(f"Exposure: {guideline.exposure_duration}")
+            print(f"Table: {guideline.table} ({guideline.table_name})")
             print(f"Source: {guideline.source}")
             print(f"Calculated: {guideline.is_calculated}")
             if guideline.lower is not None or guideline.upper is not None:

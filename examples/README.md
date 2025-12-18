@@ -9,6 +9,7 @@ Python examples demonstrating the Guidelinely API client library.
 3. **03_batch_calculations.py** - Batch calculate multiple parameters
 4. **04_groundwater_calculations.py** - Soil-specific guideline calculations
 5. **05_advanced_workflow.py** - Advanced filtering and analysis workflow
+6. **06_analytics.py** - API usage analytics and monitoring (requires API key)
 
 ## Setup
 

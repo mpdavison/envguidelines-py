@@ -24,6 +24,8 @@ class TestSearchGuidelines:
                     "receptor": "Aquatic Life",
                     "media": "Surface Water",
                     "purpose": "Protection",
+                    "table": "Table 2",
+                    "table_name": "Chronic Aquatic Life Guidelines",
                     "source_abbreviation": "AEPA",
                     "document_abbreviation": "PAL",
                 }
@@ -36,6 +38,7 @@ class TestSearchGuidelines:
         assert len(results) == 1
         assert isinstance(results[0], GuidelineSearchResult)
         assert results[0].parameter == "Aluminum"
+        assert results[0].table_name == "Chronic Aquatic Life Guidelines"
         assert results[0].source_abbreviation == "AEPA"
 
     def test_search_by_media_and_receptor(self, httpx_mock):

@@ -45,6 +45,7 @@ class GuidelineSearchResult(BaseModel):
     purpose: Optional[str] = None
     exposure_duration: Optional[str] = None
     table: Optional[str] = None
+    table_name: Optional[str] = None
     application: Optional[str] = None
     basis: Optional[str] = None
     modifier: Optional[str] = None

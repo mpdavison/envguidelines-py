@@ -31,6 +31,7 @@ def test_guideline_response_valid():
         "exposure_duration": "chronic",
         "purpose": "long_term",
         "table": "Table 1",
+        "table_name": "Chronic Aquatic Life Guidelines",
         "application": "Freshwater guidelines",
         "basis": "Chronic toxicity",
         "use_case": "Protection",
@@ -39,6 +40,7 @@ def test_guideline_response_valid():
 
     guideline = GuidelineResponse(**data)
     assert guideline.parameter_specification == "Aluminum, Dissolved"
+    assert guideline.table_name == "Chronic Aquatic Life Guidelines"
     assert guideline.lower == 87.0
     assert guideline.upper == 100.0
 
@@ -58,12 +60,14 @@ def test_guideline_response_optional_fields():
         "exposure_duration": "chronic",
         "purpose": "long_term",
         "table": "Table 1",
+        "table_name": "Chronic Aquatic Life Guidelines",
         "application": "Freshwater guidelines",
         "basis": "Chronic toxicity",
         "document": "CCME Water Quality Guidelines",
     }
 
     guideline = GuidelineResponse(**data)
+    assert guideline.table_name == "Chronic Aquatic Life Guidelines"
     assert guideline.narrative is None
     assert guideline.lower is None
     assert guideline.upper is None
@@ -88,6 +92,7 @@ def test_calculation_response_valid():
                 "exposure_duration": "chronic",
                 "purpose": "long_term",
                 "table": "Table 1",
+                "table_name": "Chronic Aquatic Life Guidelines",
                 "application": "Freshwater guidelines",
                 "basis": "Chronic toxicity",
                 "use_case": "Protection",
@@ -99,8 +104,9 @@ def test_calculation_response_valid():
     }
 
     response = CalculationResponse(**data)
-    assert response.total_count == 1
     assert len(response.results) == 1
+    assert response.results[0].table_name == "Chronic Aquatic Life Guidelines"
+    assert response.total_count == 1
     assert response.results[0].parameter_specification == "Aluminum, Dissolved"
     assert response.contexts is None  # Optional field
 
