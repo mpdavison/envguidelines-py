@@ -53,6 +53,9 @@ Repository = "https://github.com/mpdavison/envguidelines-py"
 where = ["."]
 include = ["guidelinely*"]
 
+[tool.setuptools.package-data]
+guidelinely = ["py.typed"]
+
 [tool.setuptools_scm]
 version_scheme = "no-guess-dev"
 local_scheme = "no-local-version"
