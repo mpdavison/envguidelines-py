@@ -143,6 +143,29 @@ class TestSearchGuidelines:
         assert len(results) == 1
         assert results[0].location == "Alberta"
 
+    def test_search_by_table_name(self, httpx_mock):
+        """Test searching guidelines by table name."""
+        httpx_mock.add_response(
+            method="GET",
+            url=f"{API_BASE}/guidelines/search?table_name=Chronic+Aquatic+Life+Guidelines&limit=100",
+            json=[
+                {
+                    "id": 450,
+                    "parameter": "Copper",
+                    "table": "Table 2",
+                    "table_name": "Chronic Aquatic Life Guidelines",
+                    "source_abbreviation": "AEPA",
+                }
+            ],
+            status_code=200,
+        )
+
+        results = search_guidelines(table_name="Chronic Aquatic Life Guidelines")
+
+        assert len(results) == 1
+        assert results[0].table_name == "Chronic Aquatic Life Guidelines"
+        assert results[0].table == "Table 2"
+
     def test_search_multiple_filters(self, httpx_mock):
         """Test searching guidelines with multiple filters."""
         httpx_mock.add_response(

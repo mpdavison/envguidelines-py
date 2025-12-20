@@ -716,6 +716,7 @@ def search_guidelines(
     purpose: Optional[str] = None,
     exposure_duration: Optional[str] = None,
     table: Optional[str] = None,
+    table_name: Optional[str] = None,
     application: Optional[str] = None,
     basis: Optional[str] = None,
     modifier: Optional[str] = None,
@@ -747,6 +748,7 @@ def search_guidelines(
         purpose: Filter by guideline purpose (e.g., "protection", "remediation").
         exposure_duration: Filter by exposure duration (e.g., "acute", "chronic").
         table: Filter by table identifier from source document.
+        table_name: Filter by table name from source document.
         application: Filter by application context.
         basis: Filter by basis or rationale.
         modifier: Filter by modifier text.
@@ -783,6 +785,9 @@ def search_guidelines(
         # Find protection guidelines from AEPA
         results = search_guidelines(source_abbreviation="AEPA", purpose="protection")
 
+        # Find guidelines from a specific table
+        results = search_guidelines(table_name="Chronic Aquatic Life Guidelines")
+
         # Find guidelines applicable in winter
         results = search_guidelines(season="winter")
     """
@@ -804,6 +809,8 @@ def search_guidelines(
         params["exposure_duration"] = exposure_duration
     if table is not None:
         params["table"] = table
+    if table_name is not None:
+        params["table_name"] = table_name
     if application is not None:
         params["application"] = application
     if basis is not None:
