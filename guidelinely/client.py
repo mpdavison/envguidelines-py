@@ -10,7 +10,7 @@ from typing import Any, Optional, Union, cast
 
 import httpx
 
-from guidelinely.auth import get_api_key
+from guidelinely.auth import get_api_base, get_api_key
 from guidelinely.cache import get_cached, set_cached
 from guidelinely.exceptions import (
     GuidelinelyAPIError,
@@ -32,9 +32,6 @@ from guidelinely.models import (
 
 # Module logger for debugging API calls
 logger = logging.getLogger("guidelinely")
-
-# API base URL
-GUIDELINELY_API_BASE = "https://guidelines.1681248.com/api/v1"
 
 # Default timeout for HTTP requests (in seconds), configurable via environment variable
 DEFAULT_TIMEOUT = float(os.getenv("GUIDELINELY_TIMEOUT", "30.0"))
@@ -125,7 +122,7 @@ def health_check() -> dict[str, Any]:
     logger.debug("Performing health check")
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
-            response = client.get(f"{GUIDELINELY_API_BASE}/health")
+            response = client.get(f"{get_api_base()}/health")
             logger.debug(f"Health check response: {response.status_code}")
             if response.status_code != 200:
                 _handle_error(response)
@@ -158,7 +155,7 @@ def readiness_check() -> dict[str, Any]:
     logger.debug("Performing readiness check")
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
-            response = client.get(f"{GUIDELINELY_API_BASE}/ready")
+            response = client.get(f"{get_api_base()}/ready")
             logger.debug(f"Readiness check response: {response.status_code}")
             if response.status_code != 200:
                 _handle_error(response)
@@ -190,7 +187,7 @@ def list_parameters() -> list[str]:
     logger.debug("Listing all parameters")
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
-            response = client.get(f"{GUIDELINELY_API_BASE}/parameters")
+            response = client.get(f"{get_api_base()}/parameters")
             logger.debug(f"List parameters response: {response.status_code}")
             if response.status_code != 200:
                 _handle_error(response)
@@ -254,7 +251,7 @@ def search_parameters(
                 params["document"] = document
 
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/parameters/search",
+                f"{get_api_base()}/parameters/search",
                 params=params,
             )
             logger.debug(f"Search parameters response: {response.status_code}")
@@ -340,7 +337,7 @@ def match_parameters(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
             response = client.post(
-                f"{GUIDELINELY_API_BASE}/parameters/match",
+                f"{get_api_base()}/parameters/match",
                 json=body,
             )
             logger.debug(f"Match parameters response: {response.status_code}")
@@ -374,7 +371,7 @@ def list_media() -> dict[str, str]:
     logger.debug("Listing all media types")
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
-            response = client.get(f"{GUIDELINELY_API_BASE}/media")
+            response = client.get(f"{get_api_base()}/media")
             logger.debug(f"List media response: {response.status_code}")
             if response.status_code != 200:
                 _handle_error(response)
@@ -407,7 +404,7 @@ def list_sources() -> list[SourceResponse]:
     logger.debug("Listing all sources")
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
-            response = client.get(f"{GUIDELINELY_API_BASE}/sources")
+            response = client.get(f"{get_api_base()}/sources")
             logger.debug(f"List sources response: {response.status_code}")
             if response.status_code != 200:
                 _handle_error(response)
@@ -440,7 +437,7 @@ def get_stats() -> StatsResponse:
     logger.debug("Getting database statistics")
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
-            response = client.get(f"{GUIDELINELY_API_BASE}/stats")
+            response = client.get(f"{get_api_base()}/stats")
             logger.debug(f"Get stats response: {response.status_code}")
             if response.status_code != 200:
                 _handle_error(response)
@@ -559,7 +556,7 @@ def calculate_guidelines(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
             response = client.post(
-                f"{GUIDELINELY_API_BASE}/calculate",
+                f"{get_api_base()}/calculate",
                 json=body,
                 headers=headers if headers else None,
             )
@@ -687,7 +684,7 @@ def calculate_batch(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
             response = client.post(
-                f"{GUIDELINELY_API_BASE}/calculate/batch",
+                f"{get_api_base()}/calculate/batch",
                 json=body,
                 headers=headers if headers else None,
             )
@@ -850,7 +847,7 @@ def search_guidelines(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers={"User-Agent": USER_AGENT}) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/guidelines/search",
+                f"{get_api_base()}/guidelines/search",
                 params=params,
             )
             logger.debug(f"Search guidelines response: {response.status_code}")
@@ -905,7 +902,7 @@ def get_analytics_summary(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/analytics/summary",
+                f"{get_api_base()}/analytics/summary",
                 params={"days": days},
             )
             logger.debug(f"Analytics summary response: {response.status_code}")
@@ -959,7 +956,7 @@ def get_endpoint_statistics(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/analytics/endpoints",
+                f"{get_api_base()}/analytics/endpoints",
                 params={"days": days},
             )
             logger.debug(f"Endpoint statistics response: {response.status_code}")
@@ -1013,7 +1010,7 @@ def get_user_agent_statistics(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/analytics/user-agents",
+                f"{get_api_base()}/analytics/user-agents",
                 params={"days": days},
             )
             logger.debug(f"User agent statistics response: {response.status_code}")
@@ -1067,7 +1064,7 @@ def get_key_statistics(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/analytics/keys",
+                f"{get_api_base()}/analytics/keys",
                 params={"days": days},
             )
             logger.debug(f"API key statistics response: {response.status_code}")
@@ -1124,7 +1121,7 @@ def get_timeseries_data(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/analytics/timeseries",
+                f"{get_api_base()}/analytics/timeseries",
                 params={"days": days, "interval": interval},
             )
             logger.debug(f"Timeseries data response: {response.status_code}")
@@ -1177,7 +1174,7 @@ def get_error_statistics(
     try:
         with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
             response = client.get(
-                f"{GUIDELINELY_API_BASE}/analytics/errors",
+                f"{get_api_base()}/analytics/errors",
                 params={"days": days},
             )
             logger.debug(f"Error statistics response: {response.status_code}")

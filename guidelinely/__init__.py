@@ -4,7 +4,7 @@ Provides programmatic access to environmental guideline calculations and searche
 for chemical parameters in various media (water, soil, sediment).
 """
 
-from guidelinely.auth import get_api_key
+from guidelinely.auth import get_api_base, get_api_key
 from guidelinely.client import (
     calculate_batch,
     calculate_guidelines,
@@ -100,4 +100,5 @@ __all__ = [
     "GuidelinelyTimeoutError",
     # Auth
     "get_api_key",
+    "get_api_base",
 ]

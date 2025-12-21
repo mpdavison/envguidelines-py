@@ -73,6 +73,7 @@ The library supports the following environment variables for configuration:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `GUIDELINELY_API_KEY` | API key for calculation endpoints | None (optional) |
+| `GUIDELINELY_API_BASE` | API base URL | `https://guidelines.1681248.com/api/v1` |
 | `GUIDELINELY_CACHE_DIR` | Directory for persistent caching | `~/.guidelinely_cache` |
 | `GUIDELINELY_CACHE_TTL` | Cache time-to-live in seconds | `604800` (7 days) |
 | `GUIDELINELY_TIMEOUT` | HTTP request timeout in seconds | `30` |
