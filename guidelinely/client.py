@@ -866,7 +866,7 @@ def get_analytics_summary(
     days: int = 30,
     api_key: Optional[str] = None,
 ) -> AnalyticsSummary:
-    """Get comprehensive analytics summary for a specified time period.
+    """Get basic analytics summary for a specified time period.
 
     Retrieve a complete analytics overview including overall usage statistics,
     top endpoints, top API keys, and top user agents.

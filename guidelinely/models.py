@@ -231,7 +231,7 @@ class TimeSeriesData(BaseModel):
 
 
 class AnalyticsSummary(BaseModel):
-    """Comprehensive analytics summary."""
+    """Basic analytics summary."""
 
     period_start: str
     period_end: str
