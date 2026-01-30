@@ -36,12 +36,12 @@ def get_api_key(api_key: Optional[str] = None) -> Optional[str]:
     return None
 
 
-def get_api_base(api_base: Optional[str] = None) -> str:
+def get_api_base(api_base: Optional[str] = None, use_fallback: bool = True) -> str:
     """Get API base URL from argument or GUIDELINELY_API_BASE environment variable.
 
     Args:
         api_base: Optional API base URL string. If not provided, will check environment.
-
+        use_fallback: Whether to use a default API base if none is provided.
     Returns:
         API base URL string.
 
@@ -54,5 +54,8 @@ def get_api_base(api_base: Optional[str] = None) -> str:
     env_base = os.getenv("GUIDELINELY_API_BASE")
     if env_base:
         return env_base
+
+    if use_fallback:
+        return "https://guidelinely.1681248.com/api/v1"
 
     raise GuidelinelyConfigError("GUIDELINELY_API_BASE environment variable not set")

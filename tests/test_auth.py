@@ -64,11 +64,11 @@ def test_get_api_base_default_when_not_set(monkeypatch):
     """Test that GuidelinelyConfigError is raised when not set."""
     monkeypatch.delenv("GUIDELINELY_API_BASE", raising=False)
     with pytest.raises(GuidelinelyConfigError, match="GUIDELINELY_API_BASE"):
-        get_api_base()
+        get_api_base(use_fallback=False)
 
 
 def test_get_api_base_default_when_empty_string(monkeypatch):
     """Test that GuidelinelyConfigError is raised when environment variable is empty."""
     monkeypatch.setenv("GUIDELINELY_API_BASE", "")
     with pytest.raises(GuidelinelyConfigError, match="GUIDELINELY_API_BASE"):
-        get_api_base()
+        get_api_base(use_fallback=False)
