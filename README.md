@@ -3,7 +3,7 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Python client library for the [Guidelinely API](https://guidelines.1681248.com/docs) - an environmental guideline calculation and search API.
+Python client library for the [Guidelinely API](https://guidelinely.1681248.com/docs) - an environmental guideline calculation and search API.
 
 Calculate context-dependent environmental guideline values for chemical parameters (Aluminum, Copper, Lead, etc.) in various media (water, soil, sediment) based on environmental conditions (pH, hardness, temperature, etc.).
 
@@ -73,7 +73,7 @@ The library supports the following environment variables for configuration:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `GUIDELINELY_API_KEY` | API key for calculation endpoints | None (optional) |
-| `GUIDELINELY_API_BASE` | API base URL | `https://guidelines.1681248.com/api/v1` |
+| `GUIDELINELY_API_BASE` | API base URL | `https://guidelinely.1681248.com/api/v1` |
 | `GUIDELINELY_CACHE_DIR` | Directory for persistent caching | `~/.guidelinely_cache` |
 | `GUIDELINELY_CACHE_TTL` | Cache time-to-live in seconds | `604800` (7 days) |
 | `GUIDELINELY_TIMEOUT` | HTTP request timeout in seconds | `30` |
@@ -478,8 +478,8 @@ See the `examples/` directory for complete working examples:
 
 ## Resources
 
-- **API Documentation**: https://guidelines.1681248.com/docs
-- **OpenAPI Spec**: https://guidelines.1681248.com/openapi.json
+- **API Documentation**: https://guidelinely.1681248.com/docs
+- **OpenAPI Spec**: https://guidelinely.1681248.com/openapi.json
 - **R Client**: https://github.com/mpdavison/envguidelines
 - **Issue Tracker**: https://github.com/mpdavison/envguidelines-py/issues
 

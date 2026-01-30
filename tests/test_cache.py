@@ -393,7 +393,7 @@ class TestCacheKeyNormalization:
         # Mock API response
         httpx_mock.add_response(
             method="POST",
-            url="https://guidelines.1681248.com/api/v1/calculate",
+            url="https://guidelinely.1681248.com/api/v1/calculate",
             json={"results": [], "context": {}, "total_count": 0},
             status_code=200,
         )
@@ -428,7 +428,7 @@ class TestCacheKeyNormalization:
         # Mock API response
         httpx_mock.add_response(
             method="POST",
-            url="https://guidelines.1681248.com/api/v1/calculate/batch",
+            url="https://guidelinely.1681248.com/api/v1/calculate/batch",
             json={"results": [], "context": {}, "total_count": 0},
             status_code=200,
         )
@@ -467,7 +467,7 @@ class TestCacheKeyNormalization:
         # Mock API response
         httpx_mock.add_response(
             method="POST",
-            url="https://guidelines.1681248.com/api/v1/calculate/batch",
+            url="https://guidelinely.1681248.com/api/v1/calculate/batch",
             json={"results": [], "context": {}, "total_count": 0},
             status_code=200,
         )

@@ -405,7 +405,7 @@ def test_get_key_statistics_timeout(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.TimeoutException("Timeout"),
-        url="https://guidelines.1681248.com/api/v1/analytics/keys?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/keys?days=30",
     )
 
     with pytest.raises(GuidelinelyTimeoutError):
@@ -420,7 +420,7 @@ def test_get_timeseries_data_timeout(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.TimeoutException("Timeout"),
-        url="https://guidelines.1681248.com/api/v1/analytics/timeseries?days=7&interval=daily",
+        url="https://guidelinely.1681248.com/api/v1/analytics/timeseries?days=7&interval=daily",
     )
 
     with pytest.raises(GuidelinelyTimeoutError):
@@ -435,7 +435,7 @@ def test_get_error_statistics_timeout(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.TimeoutException("Timeout"),
-        url="https://guidelines.1681248.com/api/v1/analytics/errors?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/errors?days=30",
     )
 
     with pytest.raises(GuidelinelyTimeoutError):
@@ -450,7 +450,7 @@ def test_get_analytics_summary_connection_error(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.ConnectError("Connection failed"),
-        url="https://guidelines.1681248.com/api/v1/analytics/summary?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/summary?days=30",
     )
 
     with pytest.raises(GuidelinelyConnectionError):
@@ -465,7 +465,7 @@ def test_get_endpoint_statistics_connection_error(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.ConnectError("Connection failed"),
-        url="https://guidelines.1681248.com/api/v1/analytics/endpoints?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/endpoints?days=30",
     )
 
     with pytest.raises(GuidelinelyConnectionError):
@@ -480,7 +480,7 @@ def test_get_user_agent_statistics_connection_error(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.ConnectError("Connection failed"),
-        url="https://guidelines.1681248.com/api/v1/analytics/user-agents?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/user-agents?days=30",
     )
 
     with pytest.raises(GuidelinelyConnectionError):
@@ -495,7 +495,7 @@ def test_get_key_statistics_connection_error(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.ConnectError("Connection failed"),
-        url="https://guidelines.1681248.com/api/v1/analytics/keys?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/keys?days=30",
     )
 
     with pytest.raises(GuidelinelyConnectionError):
@@ -510,7 +510,7 @@ def test_get_timeseries_data_connection_error(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.ConnectError("Connection failed"),
-        url="https://guidelines.1681248.com/api/v1/analytics/timeseries?days=7&interval=daily",
+        url="https://guidelinely.1681248.com/api/v1/analytics/timeseries?days=7&interval=daily",
     )
 
     with pytest.raises(GuidelinelyConnectionError):
@@ -525,7 +525,7 @@ def test_get_error_statistics_connection_error(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.ConnectError("Connection failed"),
-        url="https://guidelines.1681248.com/api/v1/analytics/errors?days=30",
+        url="https://guidelinely.1681248.com/api/v1/analytics/errors?days=30",
     )
 
     with pytest.raises(GuidelinelyConnectionError):

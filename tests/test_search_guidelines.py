@@ -5,7 +5,7 @@ import pytest
 from guidelinely import GuidelineSearchResult, search_guidelines
 from guidelinely.exceptions import GuidelinelyAPIError
 
-API_BASE = "https://guidelines.1681248.com/api/v1"
+API_BASE = "https://guidelinely.1681248.com/api/v1"
 
 
 class TestSearchGuidelines:
