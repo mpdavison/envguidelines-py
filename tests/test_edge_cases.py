@@ -14,6 +14,7 @@ import pytest
 from guidelinely import (
     calculate_batch,
     calculate_guidelines,
+    get_api_base,
     health_check,
     list_parameters,
     search_parameters,
@@ -25,7 +26,7 @@ from guidelinely.exceptions import (
     GuidelinelyTimeoutError,
 )
 
-API_BASE = "https://guidelines.1681248.com/api/v1"
+API_BASE = get_api_base()
 
 
 class TestTimeoutHandling:

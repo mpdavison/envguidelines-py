@@ -5,6 +5,7 @@ import pytest
 from guidelinely import (
     calculate_batch,
     calculate_guidelines,
+    get_api_base,
     get_stats,
     health_check,
     list_media,
@@ -17,7 +18,7 @@ from guidelinely import (
 from guidelinely.cache import cache
 from guidelinely.exceptions import GuidelinelyAPIError
 
-API_BASE = "https://guidelines.1681248.com/api/v1"
+API_BASE = get_api_base()
 
 
 def test_health_check(httpx_mock):

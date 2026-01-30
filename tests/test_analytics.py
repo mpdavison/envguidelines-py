@@ -5,6 +5,7 @@ from pytest_httpx import HTTPXMock
 
 from guidelinely import (
     get_analytics_summary,
+    get_api_base,
     get_endpoint_statistics,
     get_error_statistics,
     get_key_statistics,
@@ -65,7 +66,7 @@ def test_get_analytics_summary(httpx_mock: HTTPXMock):
     }
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/summary?days=30",
+        url=f"{get_api_base()}/analytics/summary?days=30",
         json=mock_response,
     )
 
@@ -99,7 +100,7 @@ def test_get_analytics_summary_default_days(httpx_mock: HTTPXMock):
     }
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/summary?days=30",
+        url=f"{get_api_base()}/analytics/summary?days=30",
         json=mock_response,
     )
 
@@ -127,7 +128,7 @@ def test_get_endpoint_statistics(httpx_mock: HTTPXMock):
     ]
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/endpoints?days=30",
+        url=f"{get_api_base()}/analytics/endpoints?days=30",
         json=mock_response,
     )
 
@@ -161,7 +162,7 @@ def test_get_user_agent_statistics(httpx_mock: HTTPXMock):
     ]
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/user-agents?days=30",
+        url=f"{get_api_base()}/analytics/user-agents?days=30",
         json=mock_response,
     )
 
@@ -195,7 +196,7 @@ def test_get_key_statistics(httpx_mock: HTTPXMock):
     ]
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/keys?days=30",
+        url=f"{get_api_base()}/analytics/keys?days=30",
         json=mock_response,
     )
 
@@ -226,7 +227,7 @@ def test_get_timeseries_data(httpx_mock: HTTPXMock):
     ]
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/timeseries?days=7&interval=daily",
+        url=f"{get_api_base()}/analytics/timeseries?days=7&interval=daily",
         json=mock_response,
     )
 
@@ -257,7 +258,7 @@ def test_get_timeseries_data_hourly(httpx_mock: HTTPXMock):
     ]
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/timeseries?days=1&interval=hourly",
+        url=f"{get_api_base()}/analytics/timeseries?days=1&interval=hourly",
         json=mock_response,
     )
 
@@ -277,7 +278,7 @@ def test_get_error_statistics(httpx_mock: HTTPXMock):
     }
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/errors?days=30",
+        url=f"{get_api_base()}/analytics/errors?days=30",
         json=mock_response,
     )
 
@@ -308,7 +309,7 @@ def test_analytics_without_api_key(httpx_mock: HTTPXMock):
     }
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/summary?days=30",
+        url=f"{get_api_base()}/analytics/summary?days=30",
         json=mock_response,
     )
 
@@ -320,7 +321,7 @@ def test_analytics_without_api_key(httpx_mock: HTTPXMock):
 def test_analytics_error_handling(httpx_mock: HTTPXMock):
     """Test error handling for analytics endpoints."""
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/summary?days=30",
+        url=f"{get_api_base()}/analytics/summary?days=30",
         status_code=401,
         json={"detail": "Invalid API key"},
     )
@@ -342,7 +343,7 @@ def test_analytics_different_days_parameter(httpx_mock: HTTPXMock):
     ]
 
     httpx_mock.add_response(
-        url="https://guidelines.1681248.com/api/v1/analytics/endpoints?days=7",
+        url=f"{get_api_base()}/analytics/endpoints?days=7",
         json=mock_response,
     )
 
@@ -359,7 +360,7 @@ def test_get_analytics_summary_timeout(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.TimeoutException("Timeout"),
-        url="https://guidelines.1681248.com/api/v1/analytics/summary?days=30",
+        url=f"{get_api_base()}/analytics/summary?days=30",
     )
 
     with pytest.raises(GuidelinelyTimeoutError):
@@ -374,7 +375,7 @@ def test_get_endpoint_statistics_timeout(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.TimeoutException("Timeout"),
-        url="https://guidelines.1681248.com/api/v1/analytics/endpoints?days=30",
+        url=f"{get_api_base()}/analytics/endpoints?days=30",
     )
 
     with pytest.raises(GuidelinelyTimeoutError):
@@ -389,7 +390,7 @@ def test_get_user_agent_statistics_timeout(httpx_mock: HTTPXMock):
 
     httpx_mock.add_exception(
         httpx.TimeoutException("Timeout"),
-        url="https://guidelines.1681248.com/api/v1/analytics/user-agents?days=30",
+        url=f"{get_api_base()}/analytics/user-agents?days=30",
     )
 
     with pytest.raises(GuidelinelyTimeoutError):

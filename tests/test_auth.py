@@ -1,6 +1,9 @@
 """Tests for authentication helpers."""
 
+import pytest
+
 from guidelinely.auth import get_api_base, get_api_key
+from guidelinely.exceptions import GuidelinelyConfigError
 
 
 def test_get_api_key_from_argument():
@@ -58,14 +61,14 @@ def test_get_api_base_argument_overrides_environment(monkeypatch):
 
 
 def test_get_api_base_default_when_not_set(monkeypatch):
-    """Test that default production URL is returned when not set."""
+    """Test that GuidelinelyConfigError is raised when not set."""
     monkeypatch.delenv("GUIDELINELY_API_BASE", raising=False)
-    base = get_api_base()
-    assert base == "https://guidelines.1681248.com/api/v1"
+    with pytest.raises(GuidelinelyConfigError, match="GUIDELINELY_API_BASE"):
+        get_api_base()
 
 
 def test_get_api_base_default_when_empty_string(monkeypatch):
-    """Test that default is returned when environment variable is empty."""
+    """Test that GuidelinelyConfigError is raised when environment variable is empty."""
     monkeypatch.setenv("GUIDELINELY_API_BASE", "")
-    base = get_api_base()
-    assert base == "https://guidelines.1681248.com/api/v1"
+    with pytest.raises(GuidelinelyConfigError, match="GUIDELINELY_API_BASE"):
+        get_api_base()

@@ -10,6 +10,7 @@ __all__ = [
     "GuidelinelyAPIError",
     "GuidelinelyTimeoutError",
     "GuidelinelyConnectionError",
+    "GuidelinelyConfigError",
 ]
 
 
@@ -98,6 +99,22 @@ class GuidelinelyConnectionError(GuidelinelyError):
             result = calculate_guidelines(...)
         except GuidelinelyConnectionError:
             print("Could not connect to the API, check your network connection")
+    """
+
+    pass
+
+
+class GuidelinelyConfigError(GuidelinelyError):
+    """Raised when required configuration is missing.
+
+    This exception is raised when environment variables or other
+    configuration required for the client to function are not set.
+
+    Example:
+        try:
+            base = get_api_base()
+        except GuidelinelyConfigError:
+            print("Please set GUIDELINELY_API_BASE environment variable")
     """
 
     pass

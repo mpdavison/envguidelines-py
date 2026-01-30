@@ -7,10 +7,14 @@ Calculation endpoints optionally accept an API key.
 import os
 from typing import Optional
 
-__all__ = ["get_api_key", "get_api_base"]
+from dotenv import load_dotenv
 
-# Default API base URL
-DEFAULT_API_BASE = "https://guidelines.1681248.com/api/v1"
+from guidelinely.exceptions import GuidelinelyConfigError
+
+# Load environment variables from .env file if present
+load_dotenv()
+
+__all__ = ["get_api_key", "get_api_base"]
 
 
 def get_api_key(api_key: Optional[str] = None) -> Optional[str]:
@@ -39,7 +43,10 @@ def get_api_base(api_base: Optional[str] = None) -> str:
         api_base: Optional API base URL string. If not provided, will check environment.
 
     Returns:
-        API base URL string (defaults to production URL if not provided).
+        API base URL string.
+
+    Raises:
+        GuidelinelyConfigError: If no API base URL is provided and GUIDELINELY_API_BASE is not set.
     """
     if api_base is not None:
         return api_base
@@ -48,4 +55,4 @@ def get_api_base(api_base: Optional[str] = None) -> str:
     if env_base:
         return env_base
 
-    return DEFAULT_API_BASE
+    raise GuidelinelyConfigError("GUIDELINELY_API_BASE environment variable not set")
