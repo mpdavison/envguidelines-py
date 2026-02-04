@@ -6,6 +6,7 @@ from guidelinely import (
     calculate_batch,
     calculate_guidelines,
     get_api_base,
+    get_context_parameters,
     get_stats,
     health_check,
     list_media,
@@ -659,3 +660,46 @@ def test_match_parameters_no_matches(httpx_mock):
     result = match_parameters(["unknownchemical123"])
     assert result.total_queries == 1
     assert len(result.results[0].matches) == 0
+
+
+def test_get_context_parameters(httpx_mock):
+    """Test getting context parameters for guideline calculations."""
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{API_BASE}/parameters/context",
+        json={
+            "Ammonia and ammonium as N": ["pH", "temperature"],
+            "Aluminum, Dissolved": ["pH", "hardness"],
+            "Copper, Dissolved": ["hardness"],
+        },
+        status_code=200,
+    )
+
+    result = get_context_parameters(
+        ["Ammonia and ammonium as N", "Aluminum, Dissolved", "Copper, Dissolved"]
+    )
+    expected = {
+        "Ammonia and ammonium as N": ["pH", "temperature"],
+        "Aluminum, Dissolved": ["pH", "hardness"],
+        "Copper, Dissolved": ["hardness"],
+    }
+    assert result == expected
+
+
+def test_get_context_parameters_validation():
+    """Test validation for empty parameters list."""
+    with pytest.raises(ValueError, match="Parameters list cannot be empty"):
+        get_context_parameters([])
+
+
+def test_get_context_parameters_api_error(httpx_mock):
+    """Test API error handling."""
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{API_BASE}/parameters/context",
+        json={"detail": "Invalid parameter"},
+        status_code=400,
+    )
+
+    with pytest.raises(GuidelinelyAPIError):
+        get_context_parameters(["Invalid Parameter"])

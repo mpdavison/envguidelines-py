@@ -352,6 +352,69 @@ def match_parameters(
         raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
 
 
+def get_context_parameters(
+    parameters: list[str],
+    api_key: Optional[str] = None,
+) -> dict[str, list[str]]:
+    """Get context parameters required for calculating guidelines.
+
+    Get the context parameters (pH, temperature, hardness, etc.) required for
+    calculating guidelines for the specified parameters.
+
+    This endpoint helps determine what environmental context parameters are
+    needed before performing calculations.
+
+    Args:
+        parameters: List of parameter specifications (1-50 parameters).
+        api_key: Optional API key. If None, will use GUIDELINELY_API_KEY environment variable.
+
+    Returns:
+        Dictionary mapping parameter names to lists of required context parameters.
+
+    Raises:
+        ValueError: If parameters list is empty.
+        GuidelinelyAPIError: If the API returns an error response.
+        GuidelinelyTimeoutError: If the request times out.
+        GuidelinelyConnectionError: If unable to connect to the API.
+
+    Example:
+        # Get context parameters for ammonia and aluminum
+        context_params = get_context_parameters([
+            "Ammonia and ammonium as N",
+            "Aluminum, Dissolved"
+        ])
+        print(context_params)
+        # {'Ammonia and ammonium as N': ['pH', 'temperature'],
+        #  'Aluminum, Dissolved': ['pH', 'hardness']}
+    """
+    if not parameters:
+        raise ValueError("Parameters list cannot be empty")
+
+    key = get_api_key(api_key)
+    logger.debug(f"Getting context parameters for {len(parameters)} parameters")
+
+    headers: dict[str, str] = {"User-Agent": USER_AGENT}
+    if key:
+        headers["X-API-KEY"] = key
+
+    try:
+        with httpx.Client(timeout=DEFAULT_TIMEOUT, headers=headers) as client:
+            response = client.post(
+                f"{get_api_base()}/parameters/context",
+                json=parameters,
+            )
+            logger.debug(f"Get context parameters response: {response.status_code}")
+            if response.status_code != 200:
+                _handle_error(response)
+            return cast(dict[str, list[str]], response.json())
+    except httpx.TimeoutException as e:
+        logger.warning(f"Get context parameters timed out: {e}")
+        raise GuidelinelyTimeoutError(f"Request timed out: {e}") from e
+    except httpx.TransportError as e:
+        logger.warning(f"Get context parameters connection failed: {e}")
+        raise GuidelinelyConnectionError(f"Connection failed: {e}") from e
+
+
 def list_media() -> dict[str, str]:
     """List all environmental media types.
 
