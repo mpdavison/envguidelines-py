@@ -19,7 +19,7 @@ This Python client mirrors the functionality of the [R client](https://github.co
 - **Unit Conversion**: Optional target unit specification
 - **Analytics**: Monitor API usage and performance (requires authentication)
 - **Type Safety**: Full Pydantic model support for request/response validation
-- **Comprehensive Tests**: Mock-based test suite with pytest-httpx
+- **Tests**: Mock-based test suite with pytest-httpx
 - **Persistent Caching**: Automatic caching of calculation results with configurable TTL
 
 ## Installation
@@ -244,7 +244,7 @@ from guidelinely import (
     get_error_statistics,
 )
 
-# Get comprehensive analytics summary for the last 30 days
+# Get analytics summary for the last 30 days
 summary = get_analytics_summary(days=30, api_key="your_api_key")
 print(f"Total requests: {summary.overall_stats.total_requests}")
 print(f"Error rate: {summary.overall_stats.error_rate}%")
@@ -266,7 +266,7 @@ print(f"Errors by status code: {errors}")
 
 ### Analytics Functions
 
-- `get_analytics_summary(days, api_key)` - Comprehensive analytics overview
+- `get_analytics_summary(days, api_key)` - Analytics overview
 - `get_endpoint_statistics(days, api_key)` - Usage by endpoint
 - `get_user_agent_statistics(days, api_key)` - Usage by User-Agent
 - `get_key_statistics(days, api_key)` - Usage by API key
@@ -391,7 +391,7 @@ ruff check guidelinely/ tests/
 - `calculate_batch(parameters, media, context, api_key)` - Batch calculate (max 50 parameters)
 
 #### Analytics (Requires Authentication)
-- `get_analytics_summary(days, api_key)` - Comprehensive analytics overview
+- `get_analytics_summary(days, api_key)` - Analytics overview
 - `get_endpoint_statistics(days, api_key)` - Usage statistics by endpoint
 - `get_user_agent_statistics(days, api_key)` - Usage statistics by User-Agent
 - `get_key_statistics(days, api_key)` - Usage statistics by API key
@@ -409,7 +409,7 @@ ruff check guidelinely/ tests/
 - `ParameterMatch` - Single parameter match result
 - `ParameterMatchQueryResult` - Matches for a query parameter
 - `ParameterMatchResponse` - Parameter matching response
-- `AnalyticsSummary` - Comprehensive analytics overview
+- `AnalyticsSummary` - Analytics overview
 - `UsageStatistics` - Overall usage statistics
 - `EndpointStatistics` - Per-endpoint statistics
 - `APIKeyUsage` - Per-key usage statistics

@@ -1,6 +1,6 @@
 """Tests for edge cases and error handling scenarios.
 
-This module provides comprehensive tests for:
+This module provides tests for:
 - Network timeout handling
 - Invalid JSON responses
 - HTTP 4xx error codes (400, 401, 403, 404)

@@ -19,10 +19,10 @@ def main():
         print("API key is optional but recommended for calculation endpoints")
         print()
 
-    print("=== Advanced Workflow: Comprehensive Water Quality Analysis ===")
+    print("=== Advanced Workflow: Water Quality Analysis ===")
     print()
 
-    # Comprehensive batch calculation
+    # A batch calculation
     # Note: Parameter names must match exactly - use search_parameters() to find valid names
     result = calculate_batch(
         parameters=[

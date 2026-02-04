@@ -1,0 +1,11 @@
+[run]
+source =
+    guidelinely
+omit =
+    tests/*
+    examples/*
+    docs/*
+    .venv/*
+    venv/*
+    */__init__.py
+    */__pycache__/*

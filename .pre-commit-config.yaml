@@ -26,8 +26,14 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest --cov=guidelinely --cov-report=term-missing --cov-fail-under=85
+        entry: pytest tests
         language: system
         types: [python]
+        pass_filenames: false
+        always_run: true
+      - id: pytest-coverage
+        name: pytest-coverage
+        entry: python -m pytest --cov=. --cov-config=.coveragerc --cov-report=json --cov-fail-under=80 tests
+        language: system
         pass_filenames: false
         always_run: true

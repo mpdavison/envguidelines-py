@@ -72,3 +72,25 @@ def test_get_api_base_default_when_empty_string(monkeypatch):
     monkeypatch.setenv("GUIDELINELY_API_BASE", "")
     with pytest.raises(GuidelinelyConfigError, match="GUIDELINELY_API_BASE"):
         get_api_base(use_fallback=False)
+
+
+def test_get_api_base_uses_fallback_default(monkeypatch):
+    """Test that fallback default URL is used when use_fallback=True."""
+    monkeypatch.delenv("GUIDELINELY_API_BASE", raising=False)
+    base = get_api_base(use_fallback=True)
+    assert base == "https://guidelinely.1681248.com/api/v1"
+
+
+def test_get_api_base_fallback_with_empty_env(monkeypatch):
+    """Test that fallback works when env var is empty string."""
+    monkeypatch.setenv("GUIDELINELY_API_BASE", "")
+    base = get_api_base(use_fallback=True)
+    assert base == "https://guidelinely.1681248.com/api/v1"
+
+
+def test_get_api_base_fallback_default_behavior(monkeypatch):
+    """Test that use_fallback=True is the default behavior."""
+    monkeypatch.delenv("GUIDELINELY_API_BASE", raising=False)
+    # Not passing use_fallback should default to True
+    base = get_api_base()
+    assert base == "https://guidelinely.1681248.com/api/v1"

@@ -941,7 +941,7 @@ def get_analytics_summary(
         api_key: Optional API key (defaults to GUIDELINELY_API_KEY env var).
 
     Returns:
-        AnalyticsSummary with comprehensive usage data.
+        AnalyticsSummary with usage data.
 
     Raises:
         GuidelinelyAPIError: If the API returns an error response.
