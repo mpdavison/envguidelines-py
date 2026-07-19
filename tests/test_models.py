@@ -7,11 +7,30 @@ from guidelinely.models import (
     CalculateRequest,
     CalculationResponse,
     GuidelineResponse,
+    GuidelineSearchResult,
     ParameterWithUnit,
     SourceDocument,
     SourceResponse,
     StatsResponse,
 )
+
+
+def test_guideline_search_result_has_id():
+    """Test that GuidelineSearchResult model has the id field."""
+    data = {
+        "id": 123,
+        "parameter": "Aluminum",
+        "parameter_specification": "Aluminum, Dissolved",
+        "media": "surface_water",
+        "receptor": "Aquatic Life",
+        "source_name": "Alberta EPA",
+        "source_abbreviation": "AEPA",
+    }
+
+    result = GuidelineSearchResult(**data)
+    assert result.id == 123
+    assert result.parameter == "Aluminum"
+    assert result.source_name == "Alberta EPA"
 
 
 def test_guideline_response_valid():
@@ -39,6 +58,7 @@ def test_guideline_response_valid():
     }
 
     guideline = GuidelineResponse(**data)
+    assert guideline.id == 1
     assert guideline.parameter_specification == "Aluminum, Dissolved"
     assert guideline.table_name == "Chronic Aquatic Life Guidelines"
     assert guideline.lower == 87.0

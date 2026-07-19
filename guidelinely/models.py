@@ -38,6 +38,7 @@ class GuidelineSearchResult(BaseModel):
     Contains guideline metadata without calculated values.
     """
 
+    id: int
     parameter: str
     parameter_specification: Optional[str] = None
     receptor: Optional[str] = None
@@ -58,9 +59,11 @@ class GuidelineSearchResult(BaseModel):
     location: Optional[str] = None
     narrative: Optional[str] = None
     comment: Optional[str] = None
-    source: Optional[str] = None  # Source organization name
+    source: Optional[str] = None  # Source organization name (from calculation responses)
+    source_name: Optional[str] = None  # Source organization name (from search responses)
     source_abbreviation: Optional[str] = None
-    document: Optional[str] = None  # Document title
+    document: Optional[str] = None  # Document title (from calculation responses)
+    document_name: Optional[str] = None  # Document title (from search responses)
     document_abbreviation: Optional[str] = None
     document_url: Optional[str] = None
 

@@ -17,6 +17,8 @@ repos:
     hooks:
       - id: mypy
         files: ^guidelinely/
+        # additional_dependencies must stay in sync with pyproject.toml dependencies
+        # (mypy hook runs in an isolated environment and needs its own copies)
         additional_dependencies:
           - httpx>=0.25.0
           - pydantic>=2.0.0
@@ -34,7 +36,7 @@ repos:
         always_run: true
       - id: pytest-coverage
         name: pytest-coverage
-        entry: python -m pytest --cov=. --cov-config=.coveragerc --cov-report=json --cov-fail-under=80 tests
+        entry: python -m pytest --cov=. --cov-report=json --cov-fail-under=80 tests
         language: system
         pass_filenames: false
         always_run: true

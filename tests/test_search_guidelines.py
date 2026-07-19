@@ -507,3 +507,47 @@ class TestSearchGuidelines:
 
         # API may still return a reasonable number
         assert len(results) == 100
+
+    def test_search_by_source_name(self, httpx_mock):
+        """Test searching guidelines by source organization name."""
+        httpx_mock.add_response(
+            method="GET",
+            url=f"{API_BASE}/guidelines/search?source_name=Alberta+EPA&limit=100",
+            json=[
+                {
+                    "id": 1200,
+                    "parameter": "Aluminum",
+                    "source_name": "Alberta EPA",
+                    "source_abbreviation": "AEPA",
+                }
+            ],
+            status_code=200,
+        )
+
+        results = search_guidelines(source_name="Alberta EPA")
+
+        assert len(results) == 1
+        assert results[0].source_name == "Alberta EPA"
+        assert results[0].source_abbreviation == "AEPA"
+
+    def test_search_by_document_name(self, httpx_mock):
+        """Test searching guidelines by document title."""
+        httpx_mock.add_response(
+            method="GET",
+            url=f"{API_BASE}/guidelines/search?document_name=PAL+Guidelines&limit=100",
+            json=[
+                {
+                    "id": 1300,
+                    "parameter": "Copper",
+                    "document_name": "PAL Guidelines",
+                    "document_abbreviation": "PAL",
+                }
+            ],
+            status_code=200,
+        )
+
+        results = search_guidelines(document_name="PAL Guidelines")
+
+        assert len(results) == 1
+        assert results[0].document_name == "PAL Guidelines"
+        assert results[0].document_abbreviation == "PAL"
