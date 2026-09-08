@@ -406,7 +406,7 @@ ruff check guidelinely/ tests/
 - `CalculationResponse` - Calculation endpoint response
 - `SourceResponse` - Guideline source information
 - `StatsResponse` - Database statistics
-- `ParameterMatch` - Single parameter match result
+- `ParameterMatchResult` - Single parameter match result (includes constituent parts: `parameter`, `method_speciation`, `sample_fraction`)
 - `ParameterMatchQueryResult` - Matches for a query parameter
 - `ParameterMatchResponse` - Parameter matching response
 - `AnalyticsSummary` - Analytics overview
