@@ -448,11 +448,13 @@ def test_match_parameters(httpx_mock):
                     "query": "NH3",
                     "matches": [
                         {
-                            "parameter_specification": "Ammonia (Total), Total Any",
+                            "parameter_specification": "Ammonia, Total",
                             "parameter": "Ammonia",
+                            "method_speciation": "",
+                            "sample_fraction": "Total",
                             "confidence": 0.95,
                             "media_types": ["surface_water", "groundwater"],
-                            "match_type": "abbreviation",
+                            "match_type": "alias",
                             "strategy_used": "simple",
                         }
                     ],
@@ -472,8 +474,10 @@ def test_match_parameters(httpx_mock):
     match = result.results[0].matches[0]
     assert match.parameter == "Ammonia"
     assert match.confidence == 0.95
-    assert match.match_type == "abbreviation"
+    assert match.match_type == "alias"
     assert match.strategy_used == "simple"
+    assert match.method_speciation == ""
+    assert match.sample_fraction == "Total"
     assert "surface_water" in match.media_types
 
 
@@ -490,9 +494,11 @@ def test_match_parameters_multiple(httpx_mock):
                         {
                             "parameter_specification": "Aluminum, Dissolved",
                             "parameter": "Aluminum",
+                            "method_speciation": "",
+                            "sample_fraction": "Dissolved",
                             "confidence": 0.90,
                             "media_types": ["surface_water", "groundwater", "soil"],
-                            "match_type": "abbreviation",
+                            "match_type": "alias",
                             "strategy_used": "simple",
                         }
                     ],
@@ -503,9 +509,11 @@ def test_match_parameters_multiple(httpx_mock):
                         {
                             "parameter_specification": "Copper, Dissolved",
                             "parameter": "Copper",
+                            "method_speciation": "",
+                            "sample_fraction": "Dissolved",
                             "confidence": 0.92,
                             "media_types": ["surface_water", "groundwater", "soil"],
-                            "match_type": "abbreviation",
+                            "match_type": "alias",
                             "strategy_used": "simple",
                         }
                     ],
@@ -537,9 +545,11 @@ def test_match_parameters_with_strategy(httpx_mock):
                         {
                             "parameter_specification": "Aluminum, Dissolved",
                             "parameter": "Aluminum",
+                            "method_speciation": "",
+                            "sample_fraction": "Dissolved",
                             "confidence": 0.98,
                             "media_types": ["surface_water", "groundwater", "soil"],
-                            "match_type": "spelling_variant",
+                            "match_type": "alias",
                             "strategy_used": "alias",
                         }
                     ],
@@ -554,7 +564,7 @@ def test_match_parameters_with_strategy(httpx_mock):
     result = match_parameters(["Aluminium"], strategy="alias")
     assert len(result.results) == 1
     assert result.results[0].matches[0].strategy_used == "alias"
-    assert result.results[0].matches[0].match_type == "spelling_variant"
+    assert result.results[0].matches[0].match_type == "alias"
 
 
 def test_match_parameters_with_threshold(httpx_mock):
@@ -570,6 +580,8 @@ def test_match_parameters_with_threshold(httpx_mock):
                         {
                             "parameter_specification": "Ammonia (Total), Total Any",
                             "parameter": "Ammonia",
+                            "method_speciation": "",
+                            "sample_fraction": "Total Any",
                             "confidence": 0.85,
                             "media_types": ["surface_water"],
                             "match_type": "fuzzy",
@@ -578,6 +590,8 @@ def test_match_parameters_with_threshold(httpx_mock):
                         {
                             "parameter_specification": "Ammonium, Dissolved",
                             "parameter": "Ammonium",
+                            "method_speciation": "",
+                            "sample_fraction": "Dissolved",
                             "confidence": 0.80,
                             "media_types": ["surface_water"],
                             "match_type": "fuzzy",
@@ -609,6 +623,8 @@ def test_match_parameters_without_media(httpx_mock):
                         {
                             "parameter_specification": "Copper, Dissolved",
                             "parameter": "Copper",
+                            "method_speciation": "",
+                            "sample_fraction": "Dissolved",
                             "confidence": 0.95,
                             "media_types": [],
                             "match_type": "exact",

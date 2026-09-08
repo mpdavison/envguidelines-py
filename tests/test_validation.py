@@ -31,6 +31,8 @@ class TestMatchParametersBoundaries:
                     {
                         "parameter": param,
                         "parameter_specification": f"{param}, Test",
+                        "method_speciation": "",
+                        "sample_fraction": "Test",
                         "confidence": 0.95,
                         "media_types": ["surface_water"],
                         "match_type": "exact",
@@ -121,6 +123,8 @@ class TestMatchParametersBoundaries:
                             {
                                 "parameter": "Copper",
                                 "parameter_specification": "Copper, Total",
+                                "method_speciation": "",
+                                "sample_fraction": "Total",
                                 "confidence": 1.0,
                                 "media_types": ["surface_water"],
                                 "match_type": "exact",
@@ -129,6 +133,8 @@ class TestMatchParametersBoundaries:
                             {
                                 "parameter": "Copper, Dissolved",
                                 "parameter_specification": "Copper, Dissolved",
+                                "method_speciation": "",
+                                "sample_fraction": "Dissolved",
                                 "confidence": 0.8,
                                 "media_types": ["surface_water"],
                                 "match_type": "fuzzy",
@@ -137,6 +143,8 @@ class TestMatchParametersBoundaries:
                             {
                                 "parameter": "Copper, Total",
                                 "parameter_specification": "Copper, Total",
+                                "method_speciation": "",
+                                "sample_fraction": "Total",
                                 "confidence": 0.1,
                                 "media_types": ["surface_water"],
                                 "match_type": "fuzzy",
@@ -170,6 +178,8 @@ class TestMatchParametersBoundaries:
                             {
                                 "parameter": "Copper",
                                 "parameter_specification": "Copper, Total",
+                                "method_speciation": "",
+                                "sample_fraction": "Total",
                                 "confidence": 1.0,
                                 "media_types": ["surface_water"],
                                 "match_type": "exact",

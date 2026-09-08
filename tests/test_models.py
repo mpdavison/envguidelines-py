@@ -237,3 +237,67 @@ def test_stats_response_valid():
     assert stats.guidelines == 5000
     assert stats.sources == 12
     assert stats.documents == 45
+
+
+def test_parameter_match_result_parses_constituent_fields():
+    """Test ParameterMatchResult parses the constituent parts of a specification."""
+    from guidelinely.models import (
+        ParameterMatchResponse,
+        ParameterMatchResult,
+    )
+
+    payload = {
+        "results": [
+            {
+                "query": "aluminum",
+                "matches": [
+                    {
+                        "parameter_specification": "Aluminum, Dissolved",
+                        "parameter": "Aluminum",
+                        "method_speciation": "",
+                        "sample_fraction": "Dissolved",
+                        "confidence": 0.95,
+                        "media_types": ["surface_water", "groundwater"],
+                        "match_type": "substring",
+                        "strategy_used": "simple",
+                    }
+                ],
+            }
+        ],
+        "total_queries": 1,
+        "timestamp": "2025-12-16T10:30:00Z",
+    }
+
+    response = ParameterMatchResponse(**payload)
+    match = response.results[0].matches[0]
+
+    assert isinstance(match, ParameterMatchResult)
+    assert match.parameter == "Aluminum"
+    assert match.parameter_specification == "Aluminum, Dissolved"
+    assert match.method_speciation == ""
+    assert match.sample_fraction == "Dissolved"
+    assert match.match_type == "substring"
+    assert match.media_types == ["surface_water", "groundwater"]
+
+
+def test_parameter_match_result_optional_fields_default_to_none():
+    """Test ParameterMatchResult optional fields default to None when absent."""
+    from guidelinely.models import ParameterMatchResult
+
+    data = {
+        "parameter_specification": "Copper",
+        "parameter": "Copper",
+        "confidence": 1.0,
+        "match_type": "exact",
+        "strategy_used": "simple",
+    }
+
+    match = ParameterMatchResult(**data)
+    assert match.parameter == "Copper"
+    assert match.method_speciation is None
+    assert match.sample_fraction is None
+    assert match.media_types is None
+
+    # Nullable fields also accept explicit null from the API
+    match_null = ParameterMatchResult(**{**data, "media_types": None})
+    assert match_null.media_types is None
