@@ -38,9 +38,9 @@ from guidelinely.models import (
     EndpointStatistics,
     GuidelineResponse,
     GuidelineSearchResult,
-    ParameterMatch,
     ParameterMatchQueryResult,
     ParameterMatchResponse,
+    ParameterMatchResult,
     SourceDocument,
     SourceResponse,
     StatsResponse,
@@ -85,9 +85,9 @@ __all__ = [
     "SourceDocument",
     "StatsResponse",
     # Parameter matching models
-    "ParameterMatch",
     "ParameterMatchQueryResult",
     "ParameterMatchResponse",
+    "ParameterMatchResult",
     # Analytics models
     "AnalyticsSummary",
     "UsageStatistics",

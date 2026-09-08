@@ -288,8 +288,10 @@ def match_parameters(
             Default is "auto".
 
     Returns:
-        ParameterMatchResponse with matches for each query parameter, including
-        confidence scores, media types, match types, and strategies used.
+        ParameterMatchResponse with matches for each query parameter. Each match
+        includes the constituent parts of the specification (`parameter`,
+        `method_speciation`, `sample_fraction`), confidence scores, media types,
+        match types, and strategies used.
 
     Raises:
         ValueError: If parameters list is empty or has more than 50 items.

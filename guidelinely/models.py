@@ -26,7 +26,7 @@ __all__ = [
     "ParameterWithUnit",
     "SearchParametersRequest",
     # Parameter matching models
-    "ParameterMatch",
+    "ParameterMatchResult",
     "ParameterMatchQueryResult",
     "ParameterMatchResponse",
 ]
@@ -244,14 +244,16 @@ class AnalyticsSummary(BaseModel):
     top_user_agents: list[UserAgentStatistics]
 
 
-class ParameterMatch(BaseModel):
+class ParameterMatchResult(BaseModel):
     """Single parameter match result."""
 
     parameter_specification: str
     parameter: str
+    method_speciation: Optional[str] = None  # Method speciation portion of the specification
+    sample_fraction: Optional[str] = None  # Sample fraction portion (e.g., 'Total', 'Dissolved')
     confidence: float  # 0.0-1.0 confidence score
-    media_types: list[str]  # Available media types for this parameter
-    match_type: str  # Type of match (e.g., 'abbreviation', 'exact', 'fuzzy')
+    media_types: Optional[list[str]] = None  # Available media types for this parameter
+    match_type: str  # Type of match ('exact', 'substring', 'alias', 'fuzzy', 'llm')
     strategy_used: str  # Strategy that produced this match ('simple', 'alias', 'llm', 'auto')
 
 
@@ -259,7 +261,7 @@ class ParameterMatchQueryResult(BaseModel):
     """Match results for a single query parameter."""
 
     query: str  # Original query parameter
-    matches: list[ParameterMatch]  # List of matches for this query
+    matches: list[ParameterMatchResult]  # List of matches for this query, sorted by confidence
 
 
 class ParameterMatchResponse(BaseModel):
