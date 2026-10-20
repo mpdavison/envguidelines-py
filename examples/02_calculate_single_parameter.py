@@ -49,6 +49,9 @@ def main():
             print(f"Table: {guideline.table} ({guideline.table_name})")
             print(f"Source: {guideline.source}")
             print(f"Calculated: {guideline.is_calculated}")
+            print(f"Type: {guideline.guideline_type.value}")
+            if guideline.narrative:
+                print(f"Narrative: {guideline.narrative}")
             if guideline.lower is not None or guideline.upper is not None:
                 print(f"Range: [{guideline.lower}, {guideline.upper}]")
             print("-" * 80)

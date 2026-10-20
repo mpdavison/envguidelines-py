@@ -317,6 +317,7 @@ except GuidelinelyError as e:
 The library uses Pydantic for type-safe data handling:
 
 ```python
+from guidelinely import GuidelineType
 from guidelinely.models import GuidelineResponse, CalculationResponse
 
 # All API responses are strongly typed
@@ -330,7 +331,13 @@ for guideline in result.results:
     guideline.upper      # Optional[float]
     guideline.unit       # str
     guideline.is_calculated  # bool
+    guideline.guideline_type  # GuidelineType: STATIC, CALCULATED, NARRATIVE, UNKNOWN
+    guideline.narrative  # Optional[str] qualitative guidance text
 ```
+
+`guideline_type` is validated against `GuidelineType`. If the API returns an
+unrecognized value, the client emits a `UserWarning` and falls back to
+`GuidelineType.UNKNOWN` rather than failing the whole response.
 
 ## Guideline Value Format
 
@@ -401,6 +408,7 @@ ruff check guidelinely/ tests/
 ### Models
 
 #### Response Models
+- `GuidelineType` - Guideline classification enum (`STATIC`, `CALCULATED`, `NARRATIVE`, `UNKNOWN`)
 - `GuidelineResponse` - Single guideline result
 - `GuidelineSearchResult` - Search result metadata
 - `CalculationResponse` - Calculation endpoint response

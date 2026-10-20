@@ -3,6 +3,7 @@
 import pytest
 
 from guidelinely import (
+    GuidelineType,
     calculate_batch,
     calculate_guidelines,
     get_api_base,
@@ -395,6 +396,7 @@ def test_use_case_present_in_responses(httpx_mock):
                     "basis": "Chronic toxicity",
                     "use_case": "Protection",
                     "document": "CCME Water Quality Guidelines",
+                    "guideline_type": "calculated",
                 }
             ],
             "context": {"pH": "7.0 1", "hardness": "100 mg/L"},
@@ -414,6 +416,7 @@ def test_use_case_present_in_responses(httpx_mock):
     assert hasattr(result.results[0], "use_case")
     assert result.results[0].use_case == "Protection"
     assert result.results[0].use_case is not None
+    assert result.results[0].guideline_type is GuidelineType.CALCULATED
 
 
 def test_error_handling(httpx_mock):

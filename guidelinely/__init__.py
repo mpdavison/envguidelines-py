@@ -38,6 +38,7 @@ from guidelinely.models import (
     EndpointStatistics,
     GuidelineResponse,
     GuidelineSearchResult,
+    GuidelineType,
     ParameterMatchQueryResult,
     ParameterMatchResponse,
     ParameterMatchResult,
@@ -78,6 +79,7 @@ __all__ = [
     "get_timeseries_data",
     "get_error_statistics",
     # Models
+    "GuidelineType",
     "GuidelineResponse",
     "CalculationResponse",
     "GuidelineSearchResult",

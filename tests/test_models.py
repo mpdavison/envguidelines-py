@@ -1,5 +1,7 @@
 """Tests for Pydantic data models."""
 
+import warnings
+
 import pytest
 
 from guidelinely.models import (
@@ -8,6 +10,7 @@ from guidelinely.models import (
     CalculationResponse,
     GuidelineResponse,
     GuidelineSearchResult,
+    GuidelineType,
     ParameterWithUnit,
     SourceDocument,
     SourceResponse,
@@ -55,6 +58,7 @@ def test_guideline_response_valid():
         "basis": "Chronic toxicity",
         "use_case": "Protection",
         "document": "CCME Water Quality Guidelines",
+        "guideline_type": "calculated",
     }
 
     guideline = GuidelineResponse(**data)
@@ -63,6 +67,7 @@ def test_guideline_response_valid():
     assert guideline.table_name == "Chronic Aquatic Life Guidelines"
     assert guideline.lower == 87.0
     assert guideline.upper == 100.0
+    assert guideline.guideline_type is GuidelineType.CALCULATED
 
 
 def test_guideline_response_optional_fields():
@@ -93,6 +98,92 @@ def test_guideline_response_optional_fields():
     assert guideline.upper is None
     assert guideline.use_case is None  # Should be None when not provided
     assert guideline.context_index is None
+    assert guideline.guideline_type is GuidelineType.UNKNOWN
+
+
+@pytest.mark.parametrize(
+    ("raw_value", "expected"),
+    [
+        ("static", GuidelineType.STATIC),
+        ("calculated", GuidelineType.CALCULATED),
+        ("narrative", GuidelineType.NARRATIVE),
+        ("unknown", GuidelineType.UNKNOWN),
+    ],
+)
+def test_guideline_type_parses_documented_values(raw_value, expected):
+    """Test that documented guideline types parse to enum members."""
+    result = GuidelineSearchResult(
+        id=1,
+        parameter="Copper",
+        guideline_type=raw_value,
+    )
+
+    assert result.guideline_type is expected
+
+
+def test_guideline_type_defaults_to_unknown_without_warning():
+    """Test that an omitted guideline type defaults silently to unknown."""
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = GuidelineSearchResult(id=1, parameter="Copper")
+
+    assert result.guideline_type is GuidelineType.UNKNOWN
+    assert caught == []
+
+
+def test_guideline_type_unknown_value_warns_and_defaults():
+    """Test that an unrecognized guideline type warns and falls back to unknown."""
+    with pytest.warns(UserWarning, match="guideline_type"):
+        result = GuidelineSearchResult(
+            id=1,
+            parameter="Copper",
+            guideline_type="qualitative",
+        )
+
+    assert result.guideline_type is GuidelineType.UNKNOWN
+
+
+def test_guideline_type_null_warns_and_defaults():
+    """Test that a null guideline type warns and falls back to unknown."""
+    with pytest.warns(UserWarning, match="guideline_type"):
+        result = GuidelineSearchResult(
+            id=1,
+            parameter="Copper",
+            guideline_type=None,
+        )
+
+    assert result.guideline_type is GuidelineType.UNKNOWN
+
+
+def test_guideline_response_narrative_type():
+    """Test a narrative guideline response."""
+    data = {
+        "id": 11134,
+        "parameter": "Colour",
+        "parameter_specification": "Colour",
+        "media": "Surface Water",
+        "receptor": "Unknown",
+        "exposure_duration": "Unknown",
+        "purpose": "Unknown",
+        "table": "Unknown",
+        "table_name": "Unknown",
+        "application": "Narrative",
+        "basis": "human health",
+        "value": "(,)",
+        "unit": "Unknown",
+        "is_calculated": False,
+        "use_case": "Aesthetics",
+        "source": "Alberta Environment and Protected Areas",
+        "document": "Alberta REC",
+        "narrative": "No numerical guideline; assess against aesthetic criteria.",
+        "guideline_type": "narrative",
+    }
+
+    guideline = GuidelineResponse(**data)
+
+    assert guideline.guideline_type is GuidelineType.NARRATIVE
+    assert guideline.narrative is not None
+    assert guideline.is_calculated is False
 
 
 def test_calculation_response_valid():

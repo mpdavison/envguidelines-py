@@ -1,11 +1,14 @@
 """Pydantic models for Guidelinely API requests and responses."""
 
+import warnings
+from enum import Enum
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 __all__ = [
     # Response models
+    "GuidelineType",
     "GuidelineResponse",
     "CalculationResponse",
     "SourceResponse",
@@ -30,6 +33,15 @@ __all__ = [
     "ParameterMatchQueryResult",
     "ParameterMatchResponse",
 ]
+
+
+class GuidelineType(str, Enum):
+    """Classification of a guideline value."""
+
+    STATIC = "static"
+    CALCULATED = "calculated"
+    NARRATIVE = "narrative"
+    UNKNOWN = "unknown"
 
 
 class GuidelineSearchResult(BaseModel):
@@ -59,6 +71,7 @@ class GuidelineSearchResult(BaseModel):
     location: Optional[str] = None
     narrative: Optional[str] = None
     comment: Optional[str] = None
+    guideline_type: GuidelineType = GuidelineType.UNKNOWN
     source: Optional[str] = None  # Source organization name (from calculation responses)
     source_name: Optional[str] = None  # Source organization name (from search responses)
     source_abbreviation: Optional[str] = None
@@ -66,6 +79,24 @@ class GuidelineSearchResult(BaseModel):
     document_name: Optional[str] = None  # Document title (from search responses)
     document_abbreviation: Optional[str] = None
     document_url: Optional[str] = None
+
+    @field_validator("guideline_type", mode="before")
+    @classmethod
+    def _coerce_guideline_type(cls, value: Any) -> Any:
+        """Warn and fall back to ``unknown`` for unrecognized guideline types."""
+        if isinstance(value, GuidelineType):
+            return value
+        if isinstance(value, str):
+            try:
+                return GuidelineType(value)
+            except ValueError:
+                pass
+        warnings.warn(
+            f"Unknown guideline_type {value!r}; defaulting to 'unknown'",
+            UserWarning,
+            stacklevel=2,
+        )
+        return GuidelineType.UNKNOWN
 
 
 class GuidelineResponse(GuidelineSearchResult):

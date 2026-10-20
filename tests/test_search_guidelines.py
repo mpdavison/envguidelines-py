@@ -2,7 +2,7 @@
 
 import pytest
 
-from guidelinely import GuidelineSearchResult, search_guidelines
+from guidelinely import GuidelineSearchResult, GuidelineType, search_guidelines
 from guidelinely.exceptions import GuidelinelyAPIError
 
 API_BASE = "https://guidelinely.1681248.com/api/v1"
@@ -28,6 +28,7 @@ class TestSearchGuidelines:
                     "table_name": "Chronic Aquatic Life Guidelines",
                     "source_abbreviation": "AEPA",
                     "document_abbreviation": "PAL",
+                    "guideline_type": "static",
                 }
             ],
             status_code=200,
@@ -40,6 +41,7 @@ class TestSearchGuidelines:
         assert results[0].parameter == "Aluminum"
         assert results[0].table_name == "Chronic Aquatic Life Guidelines"
         assert results[0].source_abbreviation == "AEPA"
+        assert results[0].guideline_type is GuidelineType.STATIC
 
     def test_search_by_media_and_receptor(self, httpx_mock):
         """Test searching guidelines by media and receptor."""
